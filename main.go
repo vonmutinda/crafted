@@ -1,9 +1,10 @@
 package main
 
-import ( 
-	"fmt"
+import (  
+	"github.com/vonmutinda/crafted/api" 
+	
 )
 
 func main(){
-	fmt.Println("welcome")
+	api.Run()
 }
