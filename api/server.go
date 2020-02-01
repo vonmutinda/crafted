@@ -10,6 +10,7 @@ import (
 	"net/http" 
 	"github.com/vonmutinda/crafted/config"
 	"github.com/vonmutinda/crafted/api/database"
+	"github.com/vonmutinda/crafted/api/router" 
 )
 
 func Run(){  
@@ -25,30 +26,41 @@ func Run(){
 }
 
 func Listen(p string){
-	m := http.NewServeMux() 
+	
+	// set routes 
+	r := router.New()
 
+	// server configurations
 	s := &http.Server{
 		Addr			: p,
-		Handler  		: m,
+		Handler  		: r,
 		IdleTimeout		: 1*time.Second,
 		ReadTimeout		: 1*time.Second,
 		WriteTimeout	: 120*time.Second, 
 	}
 	
+	// server goroutine
 	go func(){ 
 		fmt.Println(fmt.Sprintf("Server up and running on http://localhost%s", config.PORT))
 		log.Fatal("Go run go!", s.ListenAndServe())
 	}()
-
+	
+	// for graceful shutdown - channel recieves signal
+	// CTRL+C or SIGTERM
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	signal.Notify(c, os.Kill)
 
+	// blocks until a signal is recieved
 	sig := <-c 
-	log.Println("Got a signal :", sig)
-
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	log.Println("Signal :",sig)
 	
+	// context. cancel func complains if ignored.
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second) 
+	defer cancel() 
+	
+	log.Println("Server shutting down...")
 	s.Shutdown(ctx)
+	os.Exit(0)
 }
 
