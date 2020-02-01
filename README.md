@@ -13,3 +13,7 @@
     DB_NAME="db_name" # <-provide your own-->
     DB_PASS="db_pass" # <-provide your own-->
 ```
+
+## NOTES:
+- [x] Use  `SentenceCase` when naming funcs intended for global usage.
+- [ ] 
