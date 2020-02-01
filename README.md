@@ -1,12 +1,6 @@
 # Crafted - All about Golang & Microservices
 
 ## Description
-
-╔┓┏╦━━╦┓╔┓╔━━╗╔╗
-║┗┛║┗━╣┃║┃║╯╰║║║
-║┏┓║┏━╣┗╣┗╣╰╯║╠╣
-╚┛┗╩━━╩━╩━╩━━╝╚╝
-
 - Just for func
 
 ## .env file
