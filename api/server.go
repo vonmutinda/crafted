@@ -10,12 +10,14 @@ import (
 	"net/http" 
 	"github.com/vonmutinda/crafted/config"
 	"github.com/vonmutinda/crafted/api/database"
+	"github.com/vonmutinda/crafted/api/auto"
 	"github.com/vonmutinda/crafted/api/router" 
 )
 
 func Run(){  
 	config.Load()
-
+	auto.Load()
+	
 	_, err := database.Connect()
 
 	if err != nil{

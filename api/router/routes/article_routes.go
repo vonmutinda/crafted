@@ -17,4 +17,9 @@ var articleRoutes = []Route{
 		Method: http.MethodDelete,
 		Handler: controllers.DeleteAll,
 	},
+	Route{
+		Uri: "/new/article",
+		Method: http.MethodPost,
+		Handler: controllers.CreateArticle,
+	},
 }
