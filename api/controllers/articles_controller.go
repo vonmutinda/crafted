@@ -2,9 +2,11 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 	"encoding/json" 
 	"log"
 	"github.com/vonmutinda/crafted/api/repo"
+	"github.com/gorilla/mux"
 	"github.com/vonmutinda/crafted/api/models"
 	"github.com/vonmutinda/crafted/api/database"
 	"github.com/vonmutinda/crafted/api/repo/crud" 
@@ -83,4 +85,37 @@ func DeleteAll(w http.ResponseWriter, r *http.Request){
 			responses.JSON(w, http.StatusOK, struct{Status string `json:"status"`}{Status: "OK! Deleted!"})
 
 		}(rep)
+}
+
+// find by id 
+func FetchArticleByID(w http.ResponseWriter, r *http.Request){
+	//1. connect to db 
+	db, err := database.Connect()
+
+	if err != nil {
+		log.Println("Error connecting to db",err)
+	}
+
+	// 2. Fetch id from url 
+	vars := mux.Vars(r) 
+	log.Println(vars)
+	id, err := strconv.ParseUint(vars["id"], 10, 64)
+
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	// 3. instantiate repo
+	rep := crud.NewArticleCrud(db)
+
+	// 4. find the record and respond
+	func (repo repo.ArticlesRepo){
+		article, err := repo.FindByID(id) 
+		if err != nil {
+			log.Println(err)
+			responses.ERROR(w, http.StatusInternalServerError, err)
+		}
+
+		responses.JSON(w, http.StatusOK, article)
+	}(rep)
 }

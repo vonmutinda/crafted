@@ -2,6 +2,7 @@ package crud
 
 import (
 	"github.com/jinzhu/gorm"
+	"errors"
 	"log"
 	"github.com/vonmutinda/crafted/api/models"
 
@@ -74,4 +75,35 @@ func (repo *repoArticleCrud) DeleteAllArticles() error{
 	}(done)
  
 	return nil
+}
+
+// find article by id 
+func (repo *repoArticleCrud) FindByID(id uint64) (models.Article, error){
+	// error 
+	var err error
+
+	// insantiate article 
+	article := models.Article{} 
+
+	// channel 
+	done := make(chan bool)
+
+	go func(c chan bool){
+		if err = repo.db.Debug().Model(&models.Article{}).Where("ID = ?", id).Take(&article).Error; err != nil {
+			log.Println(err)
+			done<- false
+			return
+		} 
+		done<- true
+	}(done)
+
+	if <-done == true{ 
+		return article, nil
+	}
+
+	if gorm.IsRecordNotFoundError(err){
+		return models.Article{}, errors.New("Article not found")
+	}
+
+	return models.Article{}, err	
 }

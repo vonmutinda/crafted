@@ -3,7 +3,6 @@ package routes
 import (
 	"net/http"
 	"github.com/vonmutinda/crafted/api/controllers"
-
 )
 
 var articleRoutes = []Route{
@@ -21,5 +20,10 @@ var articleRoutes = []Route{
 		Uri: "/new/article",
 		Method: http.MethodPost,
 		Handler: controllers.CreateArticle,
+	},
+	Route{
+		Uri: "/articles/{id}",
+		Method: http.MethodGet,
+		Handler: controllers.FetchArticleByID,
 	},
 }
