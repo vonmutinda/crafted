@@ -1,7 +1,8 @@
 package controllers
 
 import (
-	"net/http" 
+	"net/http"
+	"encoding/json" 
 	"log"
 	"github.com/vonmutinda/crafted/api/repo"
 	"github.com/vonmutinda/crafted/api/models"
@@ -19,9 +20,11 @@ func CreateArticle(w http.ResponseWriter, r *http.Request){
 		log.Println(err)
 	}
 
-	// 2. article instance
+	// 2. article instance + decode json to struct
 	article := models.Article{} 
-
+	if err := json.NewDecoder(r.Body).Decode(&article); err != nil{
+		responses.ERROR(w,http.StatusBadRequest, err)
+	}
 	// 3. instance of article repo 
 	rep := crud.NewArticleCrud(db) 
 
