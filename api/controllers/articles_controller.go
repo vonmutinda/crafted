@@ -1,17 +1,17 @@
 package controllers
 
 import (
-	"net/http"
-	"encoding/json"
+	"net/http" 
 	"log"
-
 	"github.com/vonmutinda/crafted/api/repo"
 	"github.com/vonmutinda/crafted/api/models"
 	"github.com/vonmutinda/crafted/api/database"
-	"github.com/vonmutinda/crafted/api/repo/crud"
+	"github.com/vonmutinda/crafted/api/repo/crud" 
+	"github.com/vonmutinda/crafted/api/responses"
 
 )
 
+// Create new article
 func CreateArticle(w http.ResponseWriter, r *http.Request){
 	// 1. db connection 
 	db, err := database.Connect() 
@@ -19,24 +19,25 @@ func CreateArticle(w http.ResponseWriter, r *http.Request){
 		log.Println(err)
 	}
 
-	// 2. decode response
-	article := models.Article{}
-	json.NewDecoder(r.Body).Decode(&article) 
-	log.Println("article:",article)
+	// 2. article instance
+	article := models.Article{} 
 
-	// 3. save data 
+	// 3. instance of article repo 
 	rep := crud.NewArticleCrud(db) 
 
+	// 4. save article
 	func (re repo.ArticlesRepo){
-		re.SaveArticle(article)
+		a, e := re.SaveArticle(article)
 
-		if err := json.NewEncoder(w).Encode(article); err != nil {
-			log.Println(err)
+		if err != nil{
+			responses.ERROR(w, http.StatusInternalServerError, e)
 		}
+		responses.JSON(w, http.StatusOK, a)
 
 	}(rep)
 }
 
+// Fetch all articles
 func GetArticles(w http.ResponseWriter, r *http.Request){
 	// 1. create db connection  
 	db, err := database.Connect()
@@ -53,15 +54,30 @@ func GetArticles(w http.ResponseWriter, r *http.Request){
 		a, e := rep.GetAllArticles()
 		if e != nil{
 			log.Println(e)
-		} 
-
-		if err := json.NewEncoder(w).Encode(a); err != nil{
-			log.Println(err)
-		}
+			responses.ERROR(w, http.StatusInternalServerError, e)
+		}  
+		responses.JSON(w, http.StatusOK, a)
 		
 	}(rep)
 }
 
+// Delete all articles
 func DeleteAll(w http.ResponseWriter, r *http.Request){
-	w.Write([]byte("All articles"))
+	// 1. db connect 
+		db, err := database.Connect()
+		if err != nil {
+			log.Println("Error connecting to db", err)
+		}
+	// 2. instantiate repo
+		rep := crud.NewArticleCrud(db)
+
+	// 3. call delete all
+		func (repo repo.ArticlesRepo){
+			if err := rep.DeleteAllArticles(); err != nil {
+				log.Println(err)
+				responses.ERROR(w, http.StatusInternalServerError, err)
+			}
+			responses.JSON(w, http.StatusOK, struct{Status string `json:"status"`}{Status: "OK! Deleted!"})
+
+		}(rep)
 }

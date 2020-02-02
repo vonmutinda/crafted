@@ -8,6 +8,7 @@ import (
 
 )
 
+// connect to db
 func Connect() (*gorm.DB, error)  {
 	db, err := gorm.Open(config.DB_DRIVER, config.DB_URL)
 

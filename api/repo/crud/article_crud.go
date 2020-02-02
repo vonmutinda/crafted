@@ -58,3 +58,20 @@ func (repo *repoArticleCrud) SaveArticle(article models.Article) (models.Article
 
 	return models.Article{}, err
 }
+
+// delete all articles 
+func (repo *repoArticleCrud) DeleteAllArticles() error{
+	// var err error 
+	done := make(chan bool)
+
+	go func(c <-chan bool){
+		if err := repo.db.Debug().Delete(&models.Article{},"title LIKE ?", "%Golang%"); err != nil {
+			log.Println(err)
+			done <- false 
+			return
+		}
+		done <- true
+	}(done)
+ 
+	return nil
+}
