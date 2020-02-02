@@ -41,11 +41,7 @@ func Load(){
 		articles[i].AuthorID = users[i].ID
 		if err = db.Debug().Model(&models.Article{}).Create(&articles[i]).Error; err != nil {
 			log.Println("error adding dummy article", err)
-		}
-
-		if err = db.Debug().Model(&articles[i]).Related(&articles[i].Author).Error; err != nil {
-			log.Println("error relating ", err)
-		}
+		} 
 	} 
 	defer db.Close()
 }

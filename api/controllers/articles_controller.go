@@ -31,7 +31,10 @@ func CreateArticle(w http.ResponseWriter, r *http.Request){
 	// 3. instance of article repo 
 	rep := crud.NewArticleCrud(db) 
 
-	// 4. save article
+	// 4. validate and save article
+	article.Prepare()
+	article.Validate() 
+	
 	func (re repo.ArticlesRepo){
 		a, e := re.SaveArticle(article)
 
@@ -80,6 +83,7 @@ func DeleteAll(w http.ResponseWriter, r *http.Request){
 
 	// 3. call delete all
 		func (repo repo.ArticlesRepo){
+			// ra means ===> rows affected
 			ra, err := rep.DeleteAllArticles()
 			if err != nil {
 				log.Println(err)

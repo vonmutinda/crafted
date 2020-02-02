@@ -19,19 +19,34 @@ func NewArticleCrud(db *gorm.DB) *repoArticleCrud{
 func (repo *repoArticleCrud) GetAllArticles() ([]models.Article, error){
 	var err error
 
+	// articles slice
 	articles := []models.Article{}
 
+	// channels
 	done := make(chan bool)
 
-	go func(c<-chan bool){
-		err := repo.db.Debug().Model(&models.Article{}).Find(&articles).Error
-		if err != nil {
+	// go routine to fetch articles
+	go func(c chan<- bool){
+		if err := repo.db.Debug().Model(&models.Article{}).Find(&articles).Error; err != nil {
 			log.Println("Error fetching records :", err)
-			done <- false
+			c<- false
 			return
 		}
-		done<- true 
+
+		// append apropriate author for post before response
+		if len(articles) > 0 {
+			for i, _ := range articles{
+				err = repo.db.Debug().Model(&models.User{}).Where("id = ?", articles[i].AuthorID).Take(&articles[i].Author).Error
+				if err != nil {
+					c<- false
+					return  
+				}
+			}
+		}  
+		c<- true 
 	}(done)
+	
+	log.Println("channel status :", done)
 
 	if <-done == true {
 		return articles,nil
@@ -44,13 +59,13 @@ func (repo *repoArticleCrud) SaveArticle(article models.Article) (models.Article
 	var err error
 	// goroutine for saving
 	done := make(chan bool)
-	go func(c <-chan bool){
+	go func(c chan<- bool){
 		if err := repo.db.Debug().Model(&models.Article{}).Create(&article).Error; err != nil { 
 			log.Println(err) 
-			done <- false
+			c <- false
 			return
 		} 
-		done <- true 
+		c<- true 
 	}(done)
 
 	if <-done == true {
@@ -66,9 +81,9 @@ func (repo *repoArticleCrud) DeleteAllArticles() (int64, error){
 	var rep *gorm.DB
 	done := make(chan bool)
 
-	go func(c <-chan bool){  
+	go func(c chan<- bool){  
 		rep = repo.db.Debug().Model(&models.Article{}).Delete(&models.Article{})
-		done <- true
+		c<- true
 	}(done)
 	
 	if <-done == true {
@@ -92,13 +107,13 @@ func (repo *repoArticleCrud) FindByID(id uint64) (models.Article, error){
 	// channel 
 	done := make(chan bool)
 
-	go func(c chan bool){
+	go func(c chan<- bool){
 		if err = repo.db.Debug().Model(&models.Article{}).Where("ID = ?", id).Take(&article).Error; err != nil {
 			log.Println(err)
-			done<- false
+			c<- false
 			return
 		} 
-		done<- true
+		c<- true
 	}(done)
 
 	if <-done == true{ 
@@ -117,7 +132,7 @@ func (repo *repoArticleCrud) DeleteByID(id uint64) (int64, error){
 	var rep *gorm.DB
 
 	done := make(chan bool) 
-	go func(c chan bool){
+	go func(c chan<- bool){
 		defer close(c) 
 		rep = repo.db.Debug().Model(&models.Article{}).Where("id = ?", id).Delete(&models.Article{})
 		c<- true

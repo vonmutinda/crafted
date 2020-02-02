@@ -62,7 +62,7 @@ func (r *repoUsersCrud) FindById(uid uint64) ( models.User, error){
 
 	user := models.User{}
 	// a goroutine (channel) for fetching records
-	done := make( chan bool) 
+	done := make(chan bool) 
 	go func(ch chan<- bool){
 		if err = r.db.Debug().Model(&models.User{}).Where("id = ?", uid).Take(&user).Error; err != nil {
 			ch<- false

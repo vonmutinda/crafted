@@ -7,17 +7,12 @@ import (
 
 var articleRoutes = []Route{
 	Route{
-		Uri: "/",
+		Uri: "/articles",
 		Method: http.MethodGet,
 		Handler: controllers.GetArticles,
 	},
 	Route{
-		Uri: "/delete",
-		Method: http.MethodDelete,
-		Handler: controllers.DeleteAll,
-	},
-	Route{
-		Uri: "/new/article",
+		Uri: "/articles",
 		Method: http.MethodPost,
 		Handler: controllers.CreateArticle,
 	},
@@ -30,5 +25,10 @@ var articleRoutes = []Route{
 		Uri: "/articles/{id}",
 		Method: http.MethodDelete,
 		Handler: controllers.DeleteArticleByID,
+	},
+	Route{
+		Uri: "/delete",
+		Method: http.MethodDelete,
+		Handler: controllers.DeleteAll,
 	},
 }
