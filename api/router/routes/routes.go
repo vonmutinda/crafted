@@ -13,9 +13,9 @@ type Route struct {
 	Handler		func(w http.ResponseWriter, r *http.Request)
 }
 
-func Load() []Route{
-	routes := articleRoutes
-	return routes
+func Load() []Route{ 
+	routes := append(articleRoutes, UserRoutes...)
+	return routes 
 }
 
 // NORMALLY ;In gollira mux 

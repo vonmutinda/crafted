@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"fmt"
 	"strconv"
 	"encoding/json" 
 	"log"
@@ -25,7 +26,8 @@ func CreateArticle(w http.ResponseWriter, r *http.Request){
 	// 2. article instance + decode json to struct
 	article := models.Article{} 
 	if err := json.NewDecoder(r.Body).Decode(&article); err != nil{
-		responses.ERROR(w,http.StatusBadRequest, err)
+		responses.ERROR(w,http.StatusUnprocessableEntity, err)
+		return
 	}
 	// 3. instance of article repo 
 	rep := crud.NewArticleCrud(db) 
@@ -35,9 +37,10 @@ func CreateArticle(w http.ResponseWriter, r *http.Request){
 		a, e := re.SaveArticle(article)
 
 		if err != nil{
-			responses.ERROR(w, http.StatusInternalServerError, e)
+			responses.ERROR(w, http.StatusUnprocessableEntity, e)
+			return
 		}
-		responses.JSON(w, http.StatusOK, a)
+		responses.JSON(w, http.StatusCreated, a)
 
 	}(rep)
 }
@@ -59,7 +62,7 @@ func GetArticles(w http.ResponseWriter, r *http.Request){
 		a, e := rep.GetAllArticles()
 		if e != nil{
 			log.Println(e)
-			responses.ERROR(w, http.StatusInternalServerError, e)
+			responses.ERROR(w, http.StatusUnprocessableEntity, e)
 		}  
 		responses.JSON(w, http.StatusOK, a)
 		
@@ -78,12 +81,20 @@ func DeleteAll(w http.ResponseWriter, r *http.Request){
 
 	// 3. call delete all
 		func (repo repo.ArticlesRepo){
-			if err := rep.DeleteAllArticles(); err != nil {
+			ra, err := rep.DeleteAllArticles()
+			if err != nil {
 				log.Println(err)
-				responses.ERROR(w, http.StatusInternalServerError, err)
-			}
-			responses.JSON(w, http.StatusOK, struct{Status string `json:"status"`}{Status: "OK! Deleted!"})
-
+				responses.ERROR(w, http.StatusUnprocessableEntity, err)
+			} 
+			responses.JSON(
+				w, 
+				http.StatusOK, 
+				struct{
+					Status string `json:"status"`
+				}{
+					Status: fmt.Sprintf("OK %d Records Deleted!", ra),
+				},
+			)
 		}(rep)
 }
 
@@ -113,9 +124,48 @@ func FetchArticleByID(w http.ResponseWriter, r *http.Request){
 		article, err := repo.FindByID(id) 
 		if err != nil {
 			log.Println(err)
-			responses.ERROR(w, http.StatusInternalServerError, err)
+			responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		}
 
 		responses.JSON(w, http.StatusOK, article)
+	}(rep)
+}
+
+// delete article by id 
+func DeleteArticleByID(w http.ResponseWriter, r *http.Request){
+	//1. connect to db 
+	db, err := database.Connect()
+
+	if err != nil {
+		log.Println("Error connecting to db",err)
+	}
+
+	// 2. Fetch id from url 
+	vars := mux.Vars(r) 
+	log.Println(vars)
+	id, err := strconv.ParseUint(vars["id"], 10, 64)
+
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	// 3. instantiate repo
+	rep := crud.NewArticleCrud(db)
+
+	// 4. find the record and respond
+	func (repo repo.ArticlesRepo){
+		ra, err := repo.DeleteByID(id) 
+		if err != nil {
+			log.Println(err)
+			responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		}
+
+		responses.JSON(w, http.StatusOK, 
+			struct{
+				Status string `json:"status"`
+			}{
+				Status: fmt.Sprintf("OK %d Records Deleted!", ra),
+			},
+		)
 	}(rep)
 }

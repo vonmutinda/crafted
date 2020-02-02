@@ -25,5 +25,10 @@ var articleRoutes = []Route{
 		Uri: "/articles/{id}",
 		Method: http.MethodGet,
 		Handler: controllers.FetchArticleByID,
+	}, 
+	Route{
+		Uri: "/articles/{id}",
+		Method: http.MethodDelete,
+		Handler: controllers.DeleteArticleByID,
 	},
 }

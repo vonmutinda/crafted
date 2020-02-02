@@ -61,20 +61,24 @@ func (repo *repoArticleCrud) SaveArticle(article models.Article) (models.Article
 }
 
 // delete all articles 
-func (repo *repoArticleCrud) DeleteAllArticles() error{
+func (repo *repoArticleCrud) DeleteAllArticles() (int64, error){
 	// var err error 
+	var rep *gorm.DB
 	done := make(chan bool)
 
-	go func(c <-chan bool){
-		if err := repo.db.Debug().Delete(&models.Article{},"title LIKE ?", "%Golang%"); err != nil {
-			log.Println(err)
-			done <- false 
-			return
-		}
+	go func(c <-chan bool){  
+		rep = repo.db.Debug().Model(&models.Article{}).Delete(&models.Article{})
 		done <- true
 	}(done)
- 
-	return nil
+	
+	if <-done == true {
+		if rep.Error != nil{
+			return 0, rep.Error
+		}
+		return rep.RowsAffected, nil 
+	}
+
+	return 0, rep.Error
 }
 
 // find article by id 
@@ -106,4 +110,24 @@ func (repo *repoArticleCrud) FindByID(id uint64) (models.Article, error){
 	}
 
 	return models.Article{}, err	
+}
+
+// delete article by ID
+func (repo *repoArticleCrud) DeleteByID(id uint64) (int64, error){ 
+	var rep *gorm.DB
+
+	done := make(chan bool) 
+	go func(c chan bool){
+		defer close(c) 
+		rep = repo.db.Debug().Model(&models.Article{}).Where("id = ?", id).Delete(&models.Article{})
+		c<- true
+	}(done)
+
+	if <-done == true {
+		if rep.Error != nil {
+			return 0, rep.Error
+		}
+		return rep.RowsAffected, nil
+	}
+	return 0, rep.Error
 }
