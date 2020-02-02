@@ -1,16 +1,16 @@
 package controllers
 
 import (
+	"fmt"
+	"strconv"
 	"net/http"
 	"encoding/json" 
-	"fmt"
-	"github.com/vonmutinda/crafted/api/responses"
+	"github.com/gorilla/mux"
 	"github.com/vonmutinda/crafted/api/repo" 
-	"github.com/vonmutinda/crafted/api/repo/crud"
 	"github.com/vonmutinda/crafted/api/models"
 	"github.com/vonmutinda/crafted/api/database" 
-	"github.com/gorilla/mux"
-	"strconv"
+	"github.com/vonmutinda/crafted/api/repo/crud"
+	"github.com/vonmutinda/crafted/api/responses"
 )
 
 // handleFunc methods
@@ -67,7 +67,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request){
 	}
 
 	func (re repo.UsersRepo){
-		_, err = re.Save(user)
+		user, err = re.Save(user)
 
 		if err != nil {
 			responses.ERROR(w, http.StatusUnprocessableEntity, err)
@@ -79,7 +79,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request){
 	}(rep)
 
 }
-
 
 // fetch user by ID
 func GetUser(w http.ResponseWriter, r *http.Request){

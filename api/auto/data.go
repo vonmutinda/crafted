@@ -5,6 +5,7 @@ import (
 
 )
 
+// some dummy data to get started with
 var users = []models.User{
 	models.User{
 		Nickname	: "gopher_1",

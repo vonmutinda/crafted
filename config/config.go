@@ -12,6 +12,7 @@ var (
 	DB_DRIVER =""
 )
 
+// load necessary configurations
 func Load(){ 
 	if err := godotenv.Load(); err != nil {
 		fmt.Printf("Error %s",err)

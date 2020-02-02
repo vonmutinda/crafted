@@ -20,7 +20,7 @@ func Load(){
 		log.Println(err)
 	}
 
-	// Article
+	// migrate
 	if err := db.Debug().AutoMigrate(&models.User{}, &models.Article{}).Error; err !=nil {
 		log.Println("error migrating Article:", err)
 	}
@@ -47,6 +47,5 @@ func Load(){
 			log.Println("error relating ", err)
 		}
 	} 
-
 	defer db.Close()
 }

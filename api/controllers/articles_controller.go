@@ -1,18 +1,17 @@
 package controllers
 
 import (
-	"net/http"
 	"fmt"
-	"strconv"
-	"encoding/json" 
 	"log"
-	"github.com/vonmutinda/crafted/api/repo"
+	"strconv"
+	"net/http"
+	"encoding/json" 
 	"github.com/gorilla/mux"
+	"github.com/vonmutinda/crafted/api/repo"
 	"github.com/vonmutinda/crafted/api/models"
 	"github.com/vonmutinda/crafted/api/database"
-	"github.com/vonmutinda/crafted/api/repo/crud" 
 	"github.com/vonmutinda/crafted/api/responses"
-
+	"github.com/vonmutinda/crafted/api/repo/crud" 
 )
 
 // Create new article
