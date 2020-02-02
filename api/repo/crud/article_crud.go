@@ -46,7 +46,7 @@ func (repo *repoArticleCrud) GetAllArticles() ([]models.Article, error){
 		c<- true 
 	}(done)
 	
-	log.Println("channel status :", done)
+	// log.Println("channel status :", <-done)
 
 	if <-done == true {
 		return articles,nil
@@ -60,18 +60,23 @@ func (repo *repoArticleCrud) SaveArticle(article models.Article) (models.Article
 	// goroutine for saving
 	done := make(chan bool)
 	go func(c chan<- bool){
-		if err := repo.db.Debug().Model(&models.Article{}).Create(&article).Error; err != nil { 
-			log.Println(err) 
-			c <- false
+		err = repo.db.Debug().Model(&models.Article{}).Create(&article).Error 
+		if err != nil {  
+			c<- false
 			return
 		} 
+		
+		err = repo.db.Debug().Model(&models.User{}).Where("id = ?", article.AuthorID).Take(&article.Author).Error
+		if err != nil {
+			log.Println("Error associating author", err)
+			c<- false
+		}
 		c<- true 
 	}(done)
 
 	if <-done == true {
 		return article, nil
 	}
-
 	return models.Article{}, err
 }
 

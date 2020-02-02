@@ -33,17 +33,19 @@ func CreateArticle(w http.ResponseWriter, r *http.Request){
 
 	// 4. validate and save article
 	article.Prepare()
-	article.Validate() 
-	
-	func (re repo.ArticlesRepo){
-		a, e := re.SaveArticle(article)
+	if err = article.Validate(); err != nil {
+		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
 
+	func (re repo.ArticlesRepo){
+		a, err := re.SaveArticle(article) 
 		if err != nil{
-			responses.ERROR(w, http.StatusUnprocessableEntity, e)
+			responses.ERROR(w, http.StatusUnprocessableEntity, err)
 			return
 		}
 		responses.JSON(w, http.StatusCreated, a)
-
+		return
 	}(rep)
 }
 

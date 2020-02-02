@@ -28,14 +28,17 @@ func (a *Article) Prepare(){
 }
 
 // validate article
-func (a *Article) Validate() error{
-	if a.Title == ""{
+func (a *Article) Validate() error {
+	if a.Title == "" {
 		return errors.New("Title Required")
 	}
 	if a.AuthorID < 0 {
 		return errors.New("Author required")
 	}
-	// i think body can be null.
+	if a.Body == ""{
+		return errors.New("Article body required")
+	}
+	// HOWEVER, i think body can be null.
 	// incomplete article == draft
 	return nil
 }
