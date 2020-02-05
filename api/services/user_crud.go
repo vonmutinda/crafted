@@ -6,21 +6,14 @@ import (
 	"github.com/vonmutinda/crafted/api/models" 
 )
 
-type repoUsersCrud struct {
-	db *gorm.DB
-}
-
-// returns pointer to a db connection pool/repository
-func NewUserCrud(db *gorm.DB) *repoUsersCrud {
-	return &repoUsersCrud{db}
-}
+type UserCRUD struct {}
 
 // Save method of UserRepository interface
-func (r *repoUsersCrud) Save(user models.User) (models.User, error){
-	var err error
+func (r *UserCRUD) Save(user models.User) (models.User, error){
+	var err error 
 
-	// a goroutine (channel) for saving to db
-	done := make( chan bool) 
+	done := make( chan bool)
+
 	go func(ch chan<- bool){
 		if err = r.db.Debug().Model(&models.User{}).Create(&user).Error; err != nil {
 			ch<- false
@@ -29,6 +22,12 @@ func (r *repoUsersCrud) Save(user models.User) (models.User, error){
 		ch<- true
 	}(done)
 
+	select{
+		case ok := <-done:
+			if ok == true{
+				return true
+			}
+	}
 	if <-done == true {
 		return user, nil
 	}
@@ -36,7 +35,7 @@ func (r *repoUsersCrud) Save(user models.User) (models.User, error){
 }
 
 // Fetch all the Users
-func (r *repoUsersCrud) FindAll() ([]models.User, error){
+func (r *UserCRUD) FindAll() ([]models.User, error){
 	var err error
 
 	users := []models.User{}
@@ -57,7 +56,7 @@ func (r *repoUsersCrud) FindAll() ([]models.User, error){
 }
 
 // Fetch all the Users
-func (r *repoUsersCrud) FindById(uid uint64) ( models.User, error){
+func (r *UserCRUD) FindById(uid uint64) ( models.User, error){
 	var err error
 
 	user := models.User{}

@@ -1,22 +1,17 @@
 package crud
 
 import (
-	"github.com/jinzhu/gorm"
 	"errors"
 	"log"
-	"github.com/vonmutinda/crafted/api/models"
 
+	"github.com/jinzhu/gorm"
+	"github.com/vonmutinda/crafted/api/channels"
+	"github.com/vonmutinda/crafted/api/models"
 )
 
-type repoArticleCrud struct {
-	db *gorm.DB
-}
+type ArticleCRUD struct {}
 
-func NewArticleCrud(db *gorm.DB) *repoArticleCrud{
-	return &repoArticleCrud{db:db}
-}
-
-func (repo *repoArticleCrud) GetAllArticles() ([]models.Article, error){
+func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
 	var err error
 
 	// articles slice
@@ -44,18 +39,17 @@ func (repo *repoArticleCrud) GetAllArticles() ([]models.Article, error){
 			}
 		}  
 		c<- true 
-	}(done)
-	
-	// log.Println("channel status :", <-done)
+	}(done) 
 
-	if <-done == true {
-		return articles,nil
+	if channels.OK(done){
+		close(done)
+		return articles,nil 
 	}
 	return nil, err
 }
 
 // save a new article 
-func (repo *repoArticleCrud) SaveArticle(article models.Article) (models.Article, error){
+func (repo *ArticleCRUD) SaveArticle(article models.Article) (models.Article, error){
 	var err error
 	// goroutine for saving
 	done := make(chan bool)
@@ -74,42 +68,34 @@ func (repo *repoArticleCrud) SaveArticle(article models.Article) (models.Article
 		c<- true 
 	}(done)
 
-	if <-done == true {
-		return article, nil
+	if channels.OK(done){
+		close(done)
+		return articles,nil 
 	}
 	return models.Article{}, err
 }
 
 // delete all articles 
-func (repo *repoArticleCrud) DeleteAllArticles() (int64, error){
+func (repo *ArticleCRUD) DeleteAllArticles() (int64, error){
 	// var err error 
 	var rep *gorm.DB
-	done := make(chan bool)
+	done := make(chan int, 1)
 
-	go func(c chan<- bool){  
+	go func(c chan<- int){  
 		rep = repo.db.Debug().Model(&models.Article{}).Delete(&models.Article{})
-		c<- true
+		c<- 1
 	}(done)
 	
-	if <-done == true {
-		if rep.Error != nil{
-			return 0, rep.Error
-		}
-		return rep.RowsAffected, nil 
-	}
+	<-done
 
-	return 0, rep.Error
+	return rep.RowsAffected, rep.Error
 }
 
 // find article by id 
-func (repo *repoArticleCrud) FindByID(id uint64) (models.Article, error){
-	// error 
-	var err error
+func (repo *ArticleCRUD) FindByID(id uint64) (models.Article, error){ 
 
-	// insantiate article 
-	article := models.Article{} 
-
-	// channel 
+	var err error 
+	article := models.Article{}  
 	done := make(chan bool)
 
 	go func(c chan<- bool){
@@ -121,7 +107,7 @@ func (repo *repoArticleCrud) FindByID(id uint64) (models.Article, error){
 		c<- true
 	}(done)
 
-	if <-done == true{ 
+	if channels.OK(done){ 
 		return article, nil
 	}
 
@@ -133,21 +119,17 @@ func (repo *repoArticleCrud) FindByID(id uint64) (models.Article, error){
 }
 
 // delete article by ID
-func (repo *repoArticleCrud) DeleteByID(id uint64) (int64, error){ 
+func (repo *ArticleCRUD) DeleteByID(id uint64) (int64, error){ 
 	var rep *gorm.DB
 
 	done := make(chan bool) 
-	go func(c chan<- bool){
-		defer close(c) 
+	go func(c chan<- bool){ 
 		rep = repo.db.Debug().Model(&models.Article{}).Where("id = ?", id).Delete(&models.Article{})
 		c<- true
 	}(done)
 
-	if <-done == true {
-		if rep.Error != nil {
-			return 0, rep.Error
-		}
-		return rep.RowsAffected, nil
+	if channels.OK(done){ 
+		return rep.RowsAffected, rep.Error
 	}
 	return 0, rep.Error
 }

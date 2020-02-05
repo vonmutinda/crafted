@@ -8,9 +8,15 @@ import (
 
 )
 
+var (
+	err error
+	
+	db *gorm.DB
+)
+
 // connect to db
 func Connect() (*gorm.DB, error)  {
-	db, err := gorm.Open(config.DB_DRIVER, config.DB_URL)
+	db, err = gorm.Open(config.DB_DRIVER, config.DB_URL)
 
 	if err != nil {
 		log.Println("Error connecting to db")
@@ -18,4 +24,8 @@ func Connect() (*gorm.DB, error)  {
 	}
 
 	return db, nil
+}
+
+func GetDB() *gorm.DB{
+	return db
 }

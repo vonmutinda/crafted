@@ -15,53 +15,36 @@ import (
 )
 
 // Create new article
-func CreateArticle(w http.ResponseWriter, r *http.Request){
-	// 1. db connection 
-	db, err := database.Connect() 
-	if err != nil{
-		log.Println(err)
-	}
+func CreateArticle(w http.ResponseWriter, r *http.Request){ 
+ 
+	article := models.Article{}
 
-	// 2. article instance + decode json to struct
-	article := models.Article{} 
 	if err := json.NewDecoder(r.Body).Decode(&article); err != nil{
 		responses.ERROR(w,http.StatusUnprocessableEntity, err)
 		return
-	}
-	// 3. instance of article repo 
-	rep := crud.NewArticleCrud(db) 
-
-	// 4. validate and save article
+	} 
+ 
 	article.Prepare()
-	if err = article.Validate(); err != nil {
+	article.Validate()
+
+	if err := article.Validate(); err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
-	func (re repo.ArticlesRepo){
+	func (re models.ArticlesRepo){
+
 		a, err := re.SaveArticle(article) 
 		if err != nil{
-			responses.ERROR(w, http.StatusUnprocessableEntity, err)
-			return
+			responses.ERROR(w, http.StatusUnprocessableEntity, err) 
 		}
 		responses.JSON(w, http.StatusCreated, a)
-		return
-	}(rep)
+ 	}(rep)
 }
 
 // Fetch all articles
-func GetArticles(w http.ResponseWriter, r *http.Request){
-	// 1. create db connection  
-	db, err := database.Connect()
+func GetArticles(w http.ResponseWriter, r *http.Request){  
 
-	if err != nil {
-		log.Println(err)
-	}
-
-	// 2. article repo instance
-	rep := crud.NewArticleCrud(db) 
-
-	// 3. call GetAllArticlesMethod 
 	func (re repo.ArticlesRepo){
 		a, e := rep.GetAllArticles()
 		if e != nil{
@@ -74,19 +57,11 @@ func GetArticles(w http.ResponseWriter, r *http.Request){
 }
 
 // Delete all articles
-func DeleteAll(w http.ResponseWriter, r *http.Request){
-	// 1. db connect 
-		db, err := database.Connect()
-		if err != nil {
-			log.Println("Error connecting to db", err)
-		}
-	// 2. instantiate repo
-		rep := crud.NewArticleCrud(db)
+func DeleteAll(w http.ResponseWriter, r *http.Request){  
 
-	// 3. call delete all
-		func (repo repo.ArticlesRepo){
-			// ra means ===> rows affected
+		func (repo models.ArticlesRepo){ 
 			ra, err := rep.DeleteAllArticles()
+
 			if err != nil {
 				log.Println(err)
 				responses.ERROR(w, http.StatusUnprocessableEntity, err)
@@ -106,11 +81,7 @@ func DeleteAll(w http.ResponseWriter, r *http.Request){
 // find by id 
 func FetchArticleByID(w http.ResponseWriter, r *http.Request){
 	//1. connect to db 
-	db, err := database.Connect()
-
-	if err != nil {
-		log.Println("Error connecting to db",err)
-	}
+	db := database.GetDB()
 
 	// 2. Fetch id from url 
 	vars := mux.Vars(r) 
@@ -139,11 +110,7 @@ func FetchArticleByID(w http.ResponseWriter, r *http.Request){
 // delete article by id 
 func DeleteArticleByID(w http.ResponseWriter, r *http.Request){
 	//1. connect to db 
-	db, err := database.Connect()
-
-	if err != nil {
-		log.Println("Error connecting to db",err)
-	}
+	db := database.GetDB()
 
 	// 2. Fetch id from url 
 	vars := mux.Vars(r) 
