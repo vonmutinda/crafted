@@ -26,9 +26,9 @@ var articleRoutes = []Route{
 		Method: http.MethodDelete,
 		Handler: controllers.DeleteArticleByID,
 	},
-	Route{
-		Uri: "/delete",
-		Method: http.MethodDelete,
-		Handler: controllers.DeleteAll,
-	},
+	// Route{
+	// 	Uri: "/delete",
+	// 	Method: http.MethodDelete,
+	// 	Handler: controllers.DeleteAll,
+	// },
 }

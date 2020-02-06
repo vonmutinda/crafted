@@ -82,9 +82,9 @@ func (u *User) Validate(action string) error{
 
 
 type UsersRepo interface {
-	Save(models.User) (models.User, error)
-	FindAll() ([]models.User, error)
-	FindById(uint64)(models.User, error)
+	Save(User) (User, error)
+	FindAll() ([]User, error)
+	FindById(uint64)(User, error)
 	// Update(uint32, models.User) (uint64, error)
 	// Delete(uint32) (uint64, error)
 	// DeleteAll() (error)

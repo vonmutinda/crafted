@@ -1,4 +1,4 @@
-package crud
+package services
 
 import (
 	"errors"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/vonmutinda/crafted/api/channels"
+	"github.com/vonmutinda/crafted/api/database"
 	"github.com/vonmutinda/crafted/api/models"
 )
 
@@ -22,7 +23,7 @@ func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
 
 	// go routine to fetch articles
 	go func(c chan<- bool){
-		if err := repo.db.Debug().Model(&models.Article{}).Find(&articles).Error; err != nil {
+		if err := database.GetDB().Debug().Model(&models.Article{}).Find(&articles).Error; err != nil {
 			log.Println("Error fetching records :", err)
 			c<- false
 			return
@@ -31,7 +32,7 @@ func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
 		// append apropriate author for post before response
 		if len(articles) > 0 {
 			for i, _ := range articles{
-				err = repo.db.Debug().Model(&models.User{}).Where("id = ?", articles[i].AuthorID).Take(&articles[i].Author).Error
+				err = database.GetDB().Debug().Model(&models.User{}).Where("id = ?", articles[i].AuthorID).Take(&articles[i].Author).Error
 				if err != nil {
 					c<- false
 					return  
@@ -41,8 +42,7 @@ func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
 		c<- true 
 	}(done) 
 
-	if channels.OK(done){
-		close(done)
+	if channels.OK(done){ 
 		return articles,nil 
 	}
 	return nil, err
@@ -50,17 +50,17 @@ func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
 
 // save a new article 
 func (repo *ArticleCRUD) SaveArticle(article models.Article) (models.Article, error){
-	var err error
-	// goroutine for saving
+	var err error 
+	
 	done := make(chan bool)
 	go func(c chan<- bool){
-		err = repo.db.Debug().Model(&models.Article{}).Create(&article).Error 
+		err = database.GetDB().Debug().Model(&models.Article{}).Create(&article).Error 
 		if err != nil {  
 			c<- false
 			return
 		} 
 		
-		err = repo.db.Debug().Model(&models.User{}).Where("id = ?", article.AuthorID).Take(&article.Author).Error
+		err = database.GetDB().Debug().Model(&models.User{}).Where("id = ?", article.AuthorID).Take(&article.Author).Error
 		if err != nil {
 			log.Println("Error associating author", err)
 			c<- false
@@ -68,9 +68,8 @@ func (repo *ArticleCRUD) SaveArticle(article models.Article) (models.Article, er
 		c<- true 
 	}(done)
 
-	if channels.OK(done){
-		close(done)
-		return articles,nil 
+	if channels.OK(done){ 
+		return article,nil 
 	}
 	return models.Article{}, err
 }
@@ -82,7 +81,7 @@ func (repo *ArticleCRUD) DeleteAllArticles() (int64, error){
 	done := make(chan int, 1)
 
 	go func(c chan<- int){  
-		rep = repo.db.Debug().Model(&models.Article{}).Delete(&models.Article{})
+		rep = database.GetDB().Debug().Model(&models.Article{}).Delete(&models.Article{})
 		c<- 1
 	}(done)
 	
@@ -92,14 +91,14 @@ func (repo *ArticleCRUD) DeleteAllArticles() (int64, error){
 }
 
 // find article by id 
-func (repo *ArticleCRUD) FindByID(id uint64) (models.Article, error){ 
+func (repo *ArticleCRUD) FetchArticleByID(id uint64) (models.Article, error){ 
 
 	var err error 
 	article := models.Article{}  
 	done := make(chan bool)
 
 	go func(c chan<- bool){
-		if err = repo.db.Debug().Model(&models.Article{}).Where("ID = ?", id).Take(&article).Error; err != nil {
+		if err = database.GetDB().Model(&models.Article{}).Where("ID = ?", id).Take(&article).Error; err != nil {
 			log.Println(err)
 			c<- false
 			return
@@ -122,14 +121,12 @@ func (repo *ArticleCRUD) FindByID(id uint64) (models.Article, error){
 func (repo *ArticleCRUD) DeleteByID(id uint64) (int64, error){ 
 	var rep *gorm.DB
 
-	done := make(chan bool) 
-	go func(c chan<- bool){ 
-		rep = repo.db.Debug().Model(&models.Article{}).Where("id = ?", id).Delete(&models.Article{})
-		c<- true
+	done := make(chan int, 1) 
+	go func(c chan<- int){ 
+		rep = database.GetDB().Debug().Model(&models.Article{}).Where("id = ?", id).Delete(&models.Article{})
+		c<- 1
 	}(done)
 
-	if channels.OK(done){ 
-		return rep.RowsAffected, rep.Error
-	}
-	return 0, rep.Error
+	<-done 
+	return rep.RowsAffected, rep.Error 
 }

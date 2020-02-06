@@ -1,10 +1,11 @@
 package models
 
-import ( 
-	"time"
+import (
 	"errors"
-	"strings"
 	"html"
+	"strings"
+	"time" 
+
 )
 
 
@@ -45,9 +46,9 @@ func (a *Article) Validate() error {
 
 
 type ArticlesRepo interface {
-	GetAllArticles()([]models.Article, error)
-	SaveArticle(models.Article) (models.Article, error)
-	FindByID(id uint64) (models.Article, error)
+	GetAllArticles()([]Article, error)
+	SaveArticle(Article) (Article, error)
+	FetchArticleByID(id uint64) (Article, error)
 	DeleteByID(id uint64) (int64, error)
 	// UpdateArticle(models.Article) (models.Article, error) 
 	DeleteAllArticles() (int64, error)

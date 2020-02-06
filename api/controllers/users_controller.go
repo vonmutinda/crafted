@@ -1,35 +1,25 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
-	"strconv"
 	"net/http"
-	"encoding/json" 
-	"github.com/gorilla/mux"
-	"github.com/vonmutinda/crafted/api/repo" 
+	"strconv"
+
+	"github.com/gorilla/mux" 
 	"github.com/vonmutinda/crafted/api/models"
-	"github.com/vonmutinda/crafted/api/database" 
-	"github.com/vonmutinda/crafted/api/repo/crud"
 	"github.com/vonmutinda/crafted/api/responses"
+	"github.com/vonmutinda/crafted/api/services"
 )
 
 // handleFunc methods
 
 // fetch all useers
-func GetUsers(w http.ResponseWriter, r *http.Request){
-	
-	// 1. db connection
-	db, err := database.Connect()
-	if err != nil {
-		responses.ERROR(w, http.StatusInternalServerError, err)
-		return
-	}
+func GetUsers(w http.ResponseWriter, r *http.Request){ 
 
-	// 2. instantiate user repo
-	rep := crud.NewUserCrud(db)
-
-	// 3. fetch all users - implements UserRepository interface
-	func (repo repo.UsersRepo){
+	rep := &services.UserCRUD{}
+ 
+	func (repo models.UsersRepo){
 		users, err := repo.FindAll()
 		if err != nil {
 			responses.ERROR(w, http.StatusUnprocessableEntity, err)
@@ -41,37 +31,27 @@ func GetUsers(w http.ResponseWriter, r *http.Request){
 }
 
 // Create a new user
-func CreateUser(w http.ResponseWriter, r *http.Request){
-	// user instance 
+func CreateUser(w http.ResponseWriter, r *http.Request){ 
+
 	user := models.User{}  
-	// json to struct
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-
-	// db connection
-	db, err := database.Connect()
-	if err != nil {
-		responses.ERROR(w, http.StatusInternalServerError, err)
-		return
-	}
-	// initialize repo
-	rep := crud.NewUserCrud(db)
-
-	// save new user - implements UsersRepo interface
+  
+	
 	user.Prepare()
 	if err := user.Validate(""); err != nil{
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
-		return
+		responses.ERROR(w, http.StatusUnprocessableEntity, err) 
 	}
+	
+	rep := &services.UserCRUD{} 
 
-	func (re repo.UsersRepo){
-		user, err = re.Save(user)
+	func (re models.UsersRepo){
+		user, err := re.Save(user)
 
 		if err != nil {
 			responses.ERROR(w, http.StatusUnprocessableEntity, err)
-			return
 		}
 
 		w.Header().Set("location", fmt.Sprintf("%s%s/%d", r.Host, r.URL, user.ID)) 
@@ -87,19 +67,11 @@ func GetUser(w http.ResponseWriter, r *http.Request){
 	uid, err := strconv.ParseUint( vars["id"], 10, 32 )
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
-		return
-	}
+	} 
 
-	// db connection
-	db, err := database.Connect()
-	if err != nil {
-		responses.ERROR(w, http.StatusInternalServerError, err)
-		return
-	}
+	rep := &services.UserCRUD{}  
 
-	rep := crud.NewUserCrud(db) 
-	// fetch all users - implements UserRepository interface
-	func (rep repo.UsersRepo){
+	func (rep models.UsersRepo){
 		user, err := rep.FindById(uid)
 		if err != nil {
 			responses.ERROR(w, http.StatusUnprocessableEntity, err)

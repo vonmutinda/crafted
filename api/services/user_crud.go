@@ -1,9 +1,12 @@
-package crud 
+package services 
 
 import (
 	"errors"
+
 	"github.com/jinzhu/gorm"
-	"github.com/vonmutinda/crafted/api/models" 
+	"github.com/vonmutinda/crafted/api/channels"
+	"github.com/vonmutinda/crafted/api/database"
+	"github.com/vonmutinda/crafted/api/models"
 )
 
 type UserCRUD struct {}
@@ -15,22 +18,16 @@ func (r *UserCRUD) Save(user models.User) (models.User, error){
 	done := make( chan bool)
 
 	go func(ch chan<- bool){
-		if err = r.db.Debug().Model(&models.User{}).Create(&user).Error; err != nil {
+		if err = database.GetDB().Debug().Model(&models.User{}).Create(&user).Error; err != nil {
 			ch<- false
 			return 
 		}
 		ch<- true
 	}(done)
 
-	select{
-		case ok := <-done:
-			if ok == true{
-				return true
-			}
-	}
-	if <-done == true {
+	if channels.OK(done){ 
 		return user, nil
-	}
+	} 
 	return models.User{}, err
 }
 
@@ -42,14 +39,14 @@ func (r *UserCRUD) FindAll() ([]models.User, error){
 	// a goroutine (channel) for fetching records
 	done := make( chan bool) 
 	go func(ch chan<- bool){
-		if err = r.db.Debug().Model(&models.User{}).Limit(50).Find(&users).Error; err != nil {
+		if err = database.GetDB().Model(&models.User{}).Limit(50).Find(&users).Error; err != nil {
 			ch<- false
 			return 
 		}
 		ch<- true
 	}(done)
 
-	if <-done == true{
+	if channels.OK(done){
 		return users, nil
 	}
 	return nil, err
@@ -63,14 +60,14 @@ func (r *UserCRUD) FindById(uid uint64) ( models.User, error){
 	// a goroutine (channel) for fetching records
 	done := make(chan bool) 
 	go func(ch chan<- bool){
-		if err = r.db.Debug().Model(&models.User{}).Where("id = ?", uid).Take(&user).Error; err != nil {
+		if err = database.GetDB().Debug().Model(&models.User{}).Where("id = ?", uid).Take(&user).Error; err != nil {
 			ch<- false
 			return 
 		}
 		ch<- true
 	}(done)
 
-	if <-done == true {
+	if channels.OK(done) {
 		return user, nil
 	}
 
