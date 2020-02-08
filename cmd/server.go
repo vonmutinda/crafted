@@ -1,40 +1,45 @@
-package api
+package cmd
 
 import (
-	"log"
-	"fmt"
 	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
 	"os/signal"
-	"os" 
-	"time" 
-	"net/http" 
+	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/vonmutinda/crafted/api/auto" 
+	"github.com/vonmutinda/crafted/api/router"
 	"github.com/vonmutinda/crafted/config"
-	"github.com/vonmutinda/crafted/api/database"
-	"github.com/vonmutinda/crafted/api/auto"
-	"github.com/vonmutinda/crafted/api/router" 
 )
 
-func Run(){  
-	config.Load()
-	auto.Load()
-	
-	_, err := database.Connect()
-
-	if err != nil{
-		log.Println(err)
-	}
-	
-	Listen( config.PORT)
+var serverCmd = &cobra.Command{
+	Use: "crafted",
+	Aliases: []string{"runserver", "cm"},
+	Short: "Crafted Microservices Server",
+	Long: `Start Crafted Service...`,
+	Run: func(cmd *cobra.Command, args []string){
+		run()
+	},
 }
 
-func Listen(p string){
-	
+func init(){
+	rootCmd.AddCommand(serverCmd)
+}
+
+
+func run(){
+	config.Load()
+	auto.Load() 
+
 	// set routes 
 	r := router.New()
 
 	// server configurations
 	s := &http.Server{
-		Addr			: p,
+		Addr			: string(config.PORT) ,
 		Handler  		: r,
 		IdleTimeout		: 1*time.Second,
 		ReadTimeout		: 1*time.Second,
@@ -43,7 +48,7 @@ func Listen(p string){
 	
 	// server goroutine
 	go func(){ 
-		fmt.Println(fmt.Sprintf("Server up and running on http://localhost%s", config.PORT))
+		log.Println(fmt.Sprintf("Server up and running on http://localhost%s", config.PORT))
 		log.Fatal("Go run go!", s.ListenAndServe())
 	}()
 	
@@ -64,5 +69,6 @@ func Listen(p string){
 	log.Println("Server shutting down...")
 	s.Shutdown(ctx)
 	os.Exit(0)
+
 }
 

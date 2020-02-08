@@ -11,6 +11,7 @@ import (
 )
 
 type ArticleCRUD struct {}
+ 
 
 func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
 	var err error
@@ -22,23 +23,9 @@ func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
 	done := make(chan bool)
 
 	// go routine to fetch articles
-	go func(c chan<- bool){
-		if err := database.GetDB().Debug().Model(&models.Article{}).Find(&articles).Error; err != nil {
-			log.Println("Error fetching records :", err)
-			c<- false
-			return
-		}
-
-		// append apropriate author for post before response
-		if len(articles) > 0 {
-			for i, _ := range articles{
-				err = database.GetDB().Debug().Model(&models.User{}).Where("id = ?", articles[i].AuthorID).Take(&articles[i].Author).Error
-				if err != nil {
-					c<- false
-					return  
-				}
-			}
-		}  
+	go func(c chan<- bool){ 
+		database.GetDB().Raw(`SELECT *
+								FROM articles a INNER JOIN users ON a.author_id=users.id`).Scan(&articles)
 		c<- true 
 	}(done) 
 
@@ -130,3 +117,6 @@ func (repo *ArticleCRUD) DeleteByID(id uint64) (int64, error){
 	<-done 
 	return rep.RowsAffected, rep.Error 
 }
+
+
+ 

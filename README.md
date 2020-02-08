@@ -3,6 +3,14 @@
 ## Description
 - Just for func
 
+## Features
+- [x] GET,POST,PUT,DELETE users and articles
+- [x] DB connection with ```gorm```
+
+## #TODOs
+- [ ] Authentication and Authorization Middlewares
+- [ ] CLI tooling with Cobra 
+
 ## URLS
 
 ## Setup Local
@@ -23,8 +31,16 @@
 ```
 - If you are using a different `db` from `postgres`, make sure you import its corresponding dialect in `package database`
 - Create `db` and it's name in .env file.
-- Run `go run main.go` or `go build && ./crafted`
+- Run `go run main.go crafted` or `go build && ./crafted crafted`
+
+## Technologies Used 
+Here's a list of technologies used in this project
+
+- [Golang version `go1.13.7`](https://golang.org)
+- [Cobra](https://github.com/spf13/cobra)
+- [gorilla/mux HTTP framework](https://github.com/gorilla/mux). You could as well use [Gin](https://github.com/gin-gonic/gin)
+- [Gorm ORM](https://gorm.io/). However I'd highly recommend writing raw SQL.
 
 ## NOTES:
 - [x] Use  `SentenceCase` when naming funcs intended for global usage.
-- [x] 
+- [x] Receivers must be pointers

@@ -8,40 +8,29 @@ import (
 )
 
 // Auto-migrate models
-func Load(){
-	db , err := database.Connect() 
+func Load(){  
 
-	if err != nil {
-		log.Fatal(err)
+	if err := database.Connect(); err != nil{
+		log.Println(err)
 	}
 
-	// drop exisiting tables first
-	if err := db.Debug().DropTableIfExists(&models.Article{}, &models.User{}).Error; err != nil{
+	if err := database.GetDB().DropTableIfExists(&models.Article{}, &models.User{}).Error; err != nil{
 		log.Println(err)
 	}
 
 	// migrate
-	if err := db.Debug().AutoMigrate(&models.User{}, &models.Article{}).Error; err !=nil {
+	if err := database.GetDB().AutoMigrate(&models.User{}, &models.Article{}).Error; err !=nil {
 		log.Println("error migrating Article:", err)
 	}
 
 	// relationship
-	err = db.Debug().Model(&models.Article{}).AddForeignKey("author_id","users(id)", "cascade", "cascade").Error 
-
-	if err !=nil{
-		log.Println("error creating relations:", err)
-	}
+	database.GetDB().Model(&models.Article{}).AddForeignKey("author_id","users(id)", "cascade", "cascade")
 
 	// load dummy data
 	for i, _ := range users{
-		if err = db.Debug().Model(&models.User{}).Create(&users[i]).Error; err != nil {
-			log.Println("error adding dummy user", err)
-		}
+		database.GetDB().Model(&models.User{}).Create(&users[i])
 
 		articles[i].AuthorID = users[i].ID
-		if err = db.Debug().Model(&models.Article{}).Create(&articles[i]).Error; err != nil {
-			log.Println("error adding dummy article", err)
-		} 
-	} 
-	defer db.Close()
+		database.GetDB().Model(&models.Article{}).Create(&articles[i])
+	}  
 }

@@ -15,15 +15,16 @@ var (
 )
 
 // connect to db
-func Connect() (*gorm.DB, error)  {
+func Connect() error  {
+
 	db, err = gorm.Open(config.DB_DRIVER, config.DB_URL)
 
 	if err != nil {
 		log.Println("Error connecting to db")
-		return nil, err
+		return err
 	}
 
-	return db, nil
+	return nil
 }
 
 func GetDB() *gorm.DB{
