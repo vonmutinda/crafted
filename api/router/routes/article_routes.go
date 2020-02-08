@@ -18,6 +18,11 @@ var articleRoutes = []Route{
 	},
 	Route{
 		Uri: "/articles/{id}",
+		Method: http.MethodPut,
+		Handler: controllers.UpdateArticle,
+	},
+	Route{
+		Uri: "/articles/{id}",
 		Method: http.MethodGet,
 		Handler: controllers.FetchArticleByID,
 	}, 
@@ -26,9 +31,15 @@ var articleRoutes = []Route{
 		Method: http.MethodDelete,
 		Handler: controllers.DeleteArticleByID,
 	},
-	// Route{
-	// 	Uri: "/delete",
-	// 	Method: http.MethodDelete,
-	// 	Handler: controllers.DeleteAll,
-	// },
+	Route{
+		Uri: "/delete",
+		Method: http.MethodDelete,
+		Handler: controllers.DeleteAll,
+	},
+
+	Route{
+		Uri: "/delete/{id}",
+		Method: http.MethodDelete,
+		Handler: controllers.DeleteArticleByID,
+	},
 }

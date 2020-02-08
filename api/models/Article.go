@@ -5,7 +5,6 @@ import (
 	"html"
 	"strings"
 	"time" 
-
 )
 
 
@@ -15,8 +14,9 @@ type Article struct {
 	Body			string		`gorm:"size:500;" json:"body"`
 	AuthorID		uint64		`gorm:"not_null" json:"author_id"`
 	Author 			User		`gorm:"foreignkey:AuthorID" json:"author"`
-	CreatedAt		time.Time	`gorm:"default:CURRENT_TIMESTAMP" json:"created_at"` 
-	UpdatedAt		time.Time	`gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
+	CreatedAt		time.Time	`json:"created_at"` 
+	UpdatedAt		time.Time	`json:"updated_at"` 
+	DeletedAt		*time.Time	`json:"deleted_at,omitempty" sql:"index"`
 }
 
 // prepare 
@@ -50,6 +50,6 @@ type ArticlesRepo interface {
 	SaveArticle(Article) (Article, error)
 	FetchArticleByID(id uint64) (Article, error)
 	DeleteByID(id uint64) (int64, error)
-	// UpdateArticle(models.Article) (models.Article, error) 
+	UpdateArticle(a Article, id int64)(int64, error) 
 	DeleteAllArticles() (int64, error)
 }

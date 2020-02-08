@@ -134,3 +134,36 @@ func DeleteArticleByID(w http.ResponseWriter, r *http.Request){
 		)
 	}(rep)
 }
+
+func UpdateArticle(w http.ResponseWriter, r *http.Request){
+
+	// url params 
+	vars := mux.Vars(r) 
+	aid, err := strconv.ParseInt(vars["id"], 10, 64)
+
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+	}
+
+	// decode payload 
+	newData := models.Article{}
+
+	if err := json.NewDecoder(r.Body).Decode(&newData); err != nil{
+		responses.ERROR(w, http.StatusBadRequest, err)
+	}
+
+	// update 
+	repo := &services.ArticleCRUD{}
+
+	func(re models.ArticlesRepo){
+
+		a, err := re.UpdateArticle(newData, aid)
+
+		if err != nil {
+			responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		} 
+
+		responses.JSON(w, http.StatusOK, fmt.Sprintf("%d record(s) affected",a))
+
+	}(repo)
+}

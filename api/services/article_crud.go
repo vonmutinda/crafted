@@ -1,8 +1,10 @@
 package services
 
 import (
-	"errors"
+	"errors" 
 	"log"
+	"sync"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/vonmutinda/crafted/api/channels"
@@ -68,7 +70,10 @@ func (repo *ArticleCRUD) DeleteAllArticles() (int64, error){
 	done := make(chan int, 1)
 
 	go func(c chan<- int){  
-		rep = database.GetDB().Debug().Model(&models.Article{}).Delete(&models.Article{})
+		rep = database.GetDB().Raw(`
+			UPDATE articles
+			SET deleted_at=? 
+		`, time.Now())
 		c<- 1
 	}(done)
 	
@@ -110,7 +115,7 @@ func (repo *ArticleCRUD) DeleteByID(id uint64) (int64, error){
 
 	done := make(chan int, 1) 
 	go func(c chan<- int){ 
-		rep = database.GetDB().Debug().Model(&models.Article{}).Where("id = ?", id).Delete(&models.Article{})
+		rep = database.GetDB().Where("id = ?", id).Delete(&models.Article{})
 		c<- 1
 	}(done)
 
@@ -119,4 +124,32 @@ func (repo *ArticleCRUD) DeleteByID(id uint64) (int64, error){
 }
 
 
+// update article - We'll use waitgroups
+func(repo *ArticleCRUD) UpdateArticle(updated models.Article, aid int64)(int64, error){
+
+	var gor *gorm.DB
+	var wg sync.WaitGroup 
+
+	wg.Add(1)
+	go func(done *sync.WaitGroup){
+
+		defer done.Done() 
+  
+		gor = database.GetDB().Exec(`
+			UPDATE articles
+			SET title=?,
+				body=?,
+				updated_at=?
+			WHERE id=?
+		`,updated.Title,
+		updated.Body,
+		time.Now(),
+		aid,
+	)
  
+	}(&wg)
+
+	wg.Wait()
+
+	return gor.RowsAffected, gor.Error
+} 
