@@ -6,10 +6,15 @@
 ## Features
 - [x] GET,POST,PUT,DELETE users and articles
 - [x] DB connection with ```gorm```
+- [x] RAW SQL usage alongside [GORM](https://gorm.io)
+- [x] CLI tooling with Cobra 
 
 ## #TODOs
 - [ ] Authentication and Authorization Middlewares
-- [ ] CLI tooling with Cobra 
+- [ ] GraphQL APIs 
+- [ ] gRPC 
+- [ ] Docker (containerization)
+- [ ] Service Deployment
 
 ## URLS
 
@@ -29,6 +34,7 @@
     DB_NAME="db_name" # <-provide your own-->
     DB_PASS="db_pass" # <-provide your own-->
 ```
+
 - If you are using a different `db` from `postgres`, make sure you import its corresponding dialect in `package database`
 - Create `db` and it's name in .env file.
 - Run `go run main.go crafted` or `go build && ./crafted crafted`
@@ -44,3 +50,10 @@ Here's a list of technologies used in this project
 ## NOTES:
 - [x] Use  `SentenceCase` when naming funcs intended for global usage.
 - [x] Receivers must be pointers
+
+## Resources 
+Below are helpful resources on where to read more about `Go/Golang`.
+- [Go docs](https://tour.golang.org/)
+- [Go by Example](https://gobyexample.com/)
+- [Nic Jackson](https://www.youtube.com/playlist?list=PLmD8u-IFdreyh6EUfevBcbiuCKzFk0EW_)'s Tutorial Series
+  
