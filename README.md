@@ -1,15 +1,18 @@
-# Crafted - All about Golang & Microservices
+## Crafted - All about Golang & Microservices
 
 ## Description
+
 - Just for func
 
 ## Features
+
 - [x] GET,POST,PUT,DELETE users and articles
 - [x] DB connection with ```gorm```
 - [x] RAW SQL usage alongside [GORM](https://gorm.io)
 - [x] CLI tooling with Cobra 
 
 ## #TODOs
+
 - [ ] Authentication and Authorization Middlewares
 - [ ] GraphQL APIs 
 - [ ] gRPC 
@@ -19,12 +22,14 @@
 ## URLS
 
 ## Setup Local
+
 - For set up on your machine .
 - Clone the repo `git clone https://github.com/vonmutinda/crafted.git`.
 - Run `go mod init` to check if go modules is already initialized.
 - Touch  `.env` file and paste the following configurations.
   
 ### .env file
+
 ```go
     PORT=":9000"
     DB_DRIVER="postgres" # <-provide your own-->
@@ -40,6 +45,7 @@
 - Run `go run main.go crafted` or `go build && ./crafted crafted`
 
 ## Technologies Used 
+
 Here's a list of technologies used in this project
 
 - [Golang version `go1.13.7`](https://golang.org)
@@ -48,10 +54,15 @@ Here's a list of technologies used in this project
 - [Gorm ORM](https://gorm.io/). However I'd highly recommend writing raw SQL.
 
 ## NOTES:
+
 - [x] Use  `SentenceCase` when naming funcs intended for global usage.
-- [x] Receivers must be pointers
+- [x] Receivers must be pointers.
+- [x] Channels are used when Feedback is expected from a `go routine`
+- [x] Waitgroups are used when we don't care about Feedback. We only want the job done. 
+- [x] A WaitGroup is of type `sync.WaitGroup` but we use a pointer of that type in a `go routine`. 
 
 ## Resources 
+
 Below are helpful resources on where to read more about `Go/Golang`.
 - [Go docs](https://tour.golang.org/)
 - [Go by Example](https://gobyexample.com/)

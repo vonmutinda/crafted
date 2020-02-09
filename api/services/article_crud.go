@@ -1,7 +1,6 @@
 package services
 
-import (
-	"errors" 
+import ( 
 	"log"
 	"sync"
 	"time"
@@ -27,7 +26,7 @@ func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
 	// go routine to fetch articles
 	go func(c chan<- bool){ 
 		database.GetDB().Raw(`SELECT *
-								FROM articles a INNER JOIN users ON a.author_id=users.id`).Scan(&articles)
+								FROM articles`).Scan(&articles)
 		c<- true 
 	}(done) 
 
@@ -103,7 +102,8 @@ func (repo *ArticleCRUD) FetchArticleByID(id uint64) (models.Article, error){
 	}
 
 	if gorm.IsRecordNotFoundError(err){
-		return models.Article{}, errors.New("Article not found")
+		// return models.Article{}, errors.New("Article not found")
+		return models.Article{}, err
 	}
 
 	return models.Article{}, err	

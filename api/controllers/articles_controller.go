@@ -35,7 +35,8 @@ func CreateArticle(w http.ResponseWriter, r *http.Request){
 	func (re models.ArticlesRepo){ 
 		a, err := re.SaveArticle(article) 
 		if err != nil{
-			responses.ERROR(w, http.StatusUnprocessableEntity, err) 
+			responses.ERROR(w, http.StatusUnprocessableEntity, err)
+			return 
 		}
 		responses.JSON(w, http.StatusCreated, a)
  	}(rep)
@@ -50,6 +51,7 @@ func GetArticles(w http.ResponseWriter, r *http.Request){
 		if e != nil{
 			log.Println(e)
 			responses.ERROR(w, http.StatusUnprocessableEntity, e)
+			return
 		}  
 		responses.JSON(w, http.StatusOK, a)
 		
@@ -71,7 +73,9 @@ func DeleteAll(w http.ResponseWriter, r *http.Request){
 		if err != nil {
 			log.Println(err)
 			responses.ERROR(w, http.StatusUnprocessableEntity, err)
+			return
 		} 
+
 		responses.JSON(
 			w, 
 			http.StatusOK, 
@@ -98,11 +102,12 @@ func FetchArticleByID(w http.ResponseWriter, r *http.Request){
 	repo := &services.ArticleCRUD{} 
 
 	func (rep models.ArticlesRepo){
-		article, err := rep.FetchArticleByID(id) 
-		if err != nil { 
-			responses.ERROR(w, http.StatusUnprocessableEntity, err)
-		}
+		article, err := rep.FetchArticleByID(id)
 
+		if err != nil { 
+			responses.ERROR(w, http.StatusNotFound, err)
+			return
+		} 
 		responses.JSON(w, http.StatusOK, article)
 	}(repo)
 }
