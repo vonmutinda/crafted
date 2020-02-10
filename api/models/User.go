@@ -14,7 +14,7 @@ type User struct {
 	ID 			uint64 		`gorm:"primary_key;AUTO_INCREMENT" json:"id"`
 	Nickname 	string 		`gorm:"size:20;not null,unique" json:"nickname"`
 	Email		string 		`gorm:"size:20;not null,unique" json:"email"`
-	Password	string 		`gorm:"size:60;not null" json:"password"`
+	Password	string 		`gorm:"size:60;not null" json:"-"`
 	CreatedAt	time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt	time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 	Articles	[]Article	`json:"articles,omitempty"`

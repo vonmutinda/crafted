@@ -68,3 +68,7 @@ Below are helpful resources on where to read more about `Go/Golang`.
 - [Go by Example](https://gobyexample.com/)
 - [Nic Jackson](https://www.youtube.com/playlist?list=PLmD8u-IFdreyh6EUfevBcbiuCKzFk0EW_)'s Tutorial Series
   
+
+
+
+  <!-- http://tumregels.github.io/Network-Programming-with-Go/ -->
