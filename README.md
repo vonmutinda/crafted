@@ -21,6 +21,7 @@ Inspired By [`Washington Redskins`](https://en.wikipedia.org/wiki/Go_Fund_Yourse
 - [x] DB connection with ```gorm```
 - [x] RAW SQL usage alongside [GORM](https://gorm.io)
 - [x] CLI tooling with Cobra 
+- [ ] Queues and Messaging with RabbitMQ
 
 ## #TODOs
 - [ ] Unit Testing

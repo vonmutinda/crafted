@@ -1,11 +1,11 @@
 package models
 
-import ( 
+import (
 	"html"
 	"strings"
 	"time"
-
-	"gopkg.in/go-playground/validator.v9"
+	
+	"github.com/go-playground/validator/v10"
 )
 
 
@@ -30,9 +30,9 @@ func (a *Article) Prepare(){
 
 // cooler validator
 func (a *Article) Validate() error {
-	v := validator.New()  
+	v := validator.New(); 
 	// return v.Struct(a)
-	return v.StructPartial(a,"title", "author_id")
+	return v.StructPartial(a,"Title", "AuthorID")
 }
 
 
