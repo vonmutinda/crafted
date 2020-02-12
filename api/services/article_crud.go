@@ -136,18 +136,7 @@ func(repo *ArticleCRUD) UpdateArticle(updated models.Article, aid int64)(int64, 
 	wg.Add(1)
 	go func(done *sync.WaitGroup){
 
-		defer done.Done() 
-  
-		// gor = database.GetDB().Exec(`
-		// 	UPDATE articles
-		// 	SET title=?,
-		// 		body=?,
-		// 		updated_at=?
-		// 	WHERE id=?
-		// `,updated.Title,
-		// updated.Body,
-		// time.Now(),
-		// aid,
+		defer done.Done()  
 
 		// for testing purpose let's delegate updating time to rabbitmq
 		gor = database.GetDB().Exec(`
@@ -162,8 +151,8 @@ func(repo *ArticleCRUD) UpdateArticle(updated models.Article, aid int64)(int64, 
  
 	}(&wg)
 
-	wg.Wait()
-
+	wg.Wait() 
+	
 	// send to queue 
 	s := strconv.FormatInt(aid, 10)
 	messages.SendMessage("updated_at", s)

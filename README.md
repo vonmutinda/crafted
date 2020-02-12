@@ -18,10 +18,9 @@ Inspired By [`Washington Redskins`](https://en.wikipedia.org/wiki/Go_Fund_Yourse
 
 ## Features
 - [x] GET,POST,PUT,DELETE users and articles
-- [x] DB connection with ```gorm```
-- [x] RAW SQL usage alongside [GORM](https://gorm.io)
+- [x] DB connection with ```gorm``` and RAW SQL usage alongside [GORM](https://gorm.io)
 - [x] CLI tooling with Cobra 
-- [x] Queues and Messaging with RabbitMQ
+- [x] Queues and Messaging with `RabbitMQ`
 
 ## #TODOs
 - [ ] Unit Testing
@@ -59,7 +58,7 @@ For set up on your machine .
 docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
 - Since we constantly want to listen for any messages hitting the queue, run the `cobra command`
-`go run main.go consume`
+`go run main.go consume`.
 
 ## Technologies Used 
 Here's a list of technologies used in this project

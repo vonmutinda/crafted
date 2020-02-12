@@ -37,9 +37,7 @@ func Consume(){
 		aid, err := strconv.ParseInt(string(d.Body), 10, 32)
 		if err != nil {
 			log.Println("Error parsing message body")
-		} 
-
-		
+		}  
  
 		database.GetDB().Exec(`
 			UPDATE articles
