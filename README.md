@@ -21,7 +21,7 @@ Inspired By [`Washington Redskins`](https://en.wikipedia.org/wiki/Go_Fund_Yourse
 - [x] DB connection with ```gorm```
 - [x] RAW SQL usage alongside [GORM](https://gorm.io)
 - [x] CLI tooling with Cobra 
-- [ ] Queues and Messaging with RabbitMQ
+- [x] Queues and Messaging with RabbitMQ
 
 ## #TODOs
 - [ ] Unit Testing
@@ -53,6 +53,13 @@ For set up on your machine .
 - If you are using a different `db` from `postgres`, make sure you import its corresponding dialect in `package database`
 - Create `db` and it's name in .env file.
 - Run `go run main.go crafted` or `go build && ./crafted crafted`
+- Install [Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04)
+- Start RabbitMQ container 
+```go 
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+```
+- Since we constantly want to listen for any messages hitting the queue, run the `cobra command`
+`go run main.go consume`
 
 ## Technologies Used 
 Here's a list of technologies used in this project
@@ -61,6 +68,7 @@ Here's a list of technologies used in this project
 - [Cobra](https://github.com/spf13/cobra)
 - [gorilla/mux HTTP framework](https://github.com/gorilla/mux). You could as well use [Gin](https://github.com/gin-gonic/gin)
 - [Gorm ORM](https://gorm.io/). However I'd highly recommend writing raw SQL.
+- [RabbitMQ](https://www.rabbitmq.com/tutorials/tutorial-one-go.html) Messaging and Queues. 
 
 ## NOTES:
 - [x] Use  `SentenceCase` when naming funcs intended for global usage.

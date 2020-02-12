@@ -13,7 +13,7 @@ type Article struct {
 	ID				uint64  	`gorm:"primary_key;AUTO_INCREMENT" json:"id"`
 	Title			string		`gorm:"size:250;not_null;unique" json:"title" validate:"required"`
 	Body			string		`gorm:"size:500;" json:"body"`
-	AuthorID		uint64		`gorm:"not_null" json:"author_id" validate:"required`
+	AuthorID		uint64		`gorm:"not_null" json:"author_id" validate:"required"`
 	Author 			User		`gorm:"foreignkey:AuthorID" json:"author"`
 	CreatedAt		time.Time	`json:"created_at"` 
 	UpdatedAt		time.Time	`json:"updated_at"` 

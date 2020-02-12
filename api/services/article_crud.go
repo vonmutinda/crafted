@@ -3,12 +3,14 @@ package services
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"sync"
 	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/vonmutinda/crafted/api/channels"
 	"github.com/vonmutinda/crafted/api/database"
+	"github.com/vonmutinda/crafted/api/messages"
 	"github.com/vonmutinda/crafted/api/models"
 )
 
@@ -136,21 +138,35 @@ func(repo *ArticleCRUD) UpdateArticle(updated models.Article, aid int64)(int64, 
 
 		defer done.Done() 
   
+		// gor = database.GetDB().Exec(`
+		// 	UPDATE articles
+		// 	SET title=?,
+		// 		body=?,
+		// 		updated_at=?
+		// 	WHERE id=?
+		// `,updated.Title,
+		// updated.Body,
+		// time.Now(),
+		// aid,
+
+		// for testing purpose let's delegate updating time to rabbitmq
 		gor = database.GetDB().Exec(`
-			UPDATE articles
-			SET title=?,
-				body=?,
-				updated_at=?
-			WHERE id=?
-		`,updated.Title,
-		updated.Body,
-		time.Now(),
-		aid,
-	)
+				UPDATE articles
+				SET title=?,
+					body=?
+				WHERE id=?
+			`,updated.Title,
+			updated.Body,
+			aid,
+		)
  
 	}(&wg)
 
 	wg.Wait()
+
+	// send to queue 
+	s := strconv.FormatInt(aid, 10)
+	messages.SendMessage("updated_at", s)
 
 	return gor.RowsAffected, gor.Error
 } 

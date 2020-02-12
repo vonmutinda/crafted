@@ -17,8 +17,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.6.2
-	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71 // indirect
-	github.com/vonmutinda/gopher v0.0.0-20200131081227-9a41b93a48e0
+	github.com/streadway/amqp v0.0.0-20200108173154-1c71cc93ed71
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect

@@ -6,44 +6,39 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// init connection
-func connect() *amqp.Connection {
+// init Connection
+func Connect() *amqp.Connection {  
 
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")  
 	if err != nil { 
-		failOnError(err, "Failed to connect to RabbitMQ")
+		FailOnError(err, "Failed to connect to RabbitMQ")
 	}
 	return conn
 }
 
 // fail on eror
-func failOnError(err error, msg string) {
+func FailOnError(err error, msg string) { 
 
 	if err != nil {
 	  fmt.Printf("%s: %s", msg, err)
 	}
 }
 
-// new chan
-func newChannel() *amqp.Channel {
- 
-	conn, err := connect()
+// new channel
+func NewChannel(conn *amqp.Connection) *amqp.Channel {  
 
-	chan, err := conn.Channel()
-
+	cha, err := conn.Channel() 
 	if err != nil {
-		failOnError(err, "Failed to open a channel")
+		FailOnError(err, "Failed to open a channel")
 	}
-	return chan
+	return cha
 }
 
 // new queue
-func newQueue() *amqp.Queue{ 
-
-	ch := newChannel()
+func NewQueue(queue string, ch *amqp.Channel) amqp.Queue{  
 
 	q, err := ch.QueueDeclare(
-		"hello", // name
+		queue, // name of the queue
 		false,   // durable
 		false,   // delete when unused
 		false,   // exclusive
@@ -52,18 +47,19 @@ func newQueue() *amqp.Queue{
 	  )
 	
 	if err != nil { 
-		failOnError(err, "Failed to declare a queue")  
+		FailOnError(err, "Failed to declare a queue")  
 	}
 	return q
 }
 
 // publish to queue
-func sendMessage(){ 
+func SendMessage(q_name string, body string){ 
 
-	q := newQueue()
-
-	body := "Hello World!"
-	err = ch.Publish(
+	conn := Connect()
+	cha := NewChannel(conn)
+	q := NewQueue(q_name, cha)
+ 
+	err := cha.Publish(
 	  "",     // exchange
 	  q.Name, // routing key
 	  false,  // mandatory
@@ -74,6 +70,12 @@ func sendMessage(){
 	  })
 
 	if err != nil { 
-		failOnError(err, "Failed to publish a message")
+		FailOnError(err, "Failed to publish a message")
 	}
+
+
+	fmt.Println("Sending ...", body)
+	
+	defer conn.Close() 
+	defer cha.Close()
 }
