@@ -1,18 +1,19 @@
 package models
 
-import (
-	"errors"
+import ( 
 	"html"
 	"strings"
-	"time" 
+	"time"
+
+	"gopkg.in/go-playground/validator.v9"
 )
 
 
 type Article struct {
 	ID				uint64  	`gorm:"primary_key;AUTO_INCREMENT" json:"id"`
-	Title			string		`gorm:"size:250;not_null;unique" json:"title"`
+	Title			string		`gorm:"size:250;not_null;unique" json:"title" validate:"required"`
 	Body			string		`gorm:"size:500;" json:"body"`
-	AuthorID		uint64		`gorm:"not_null" json:"author_id"`
+	AuthorID		uint64		`gorm:"not_null" json:"author_id" validate:"required`
 	Author 			User		`gorm:"foreignkey:AuthorID" json:"author"`
 	CreatedAt		time.Time	`json:"created_at"` 
 	UpdatedAt		time.Time	`json:"updated_at"` 
@@ -24,25 +25,16 @@ func (a *Article) Prepare(){
 	a.ID = 0
 	a.Title = html.EscapeString(strings.TrimSpace(a.Title))
 	a.Body = html.EscapeString(strings.TrimSpace(a.Body))
-	a.CreatedAt = time.Now()
-	a.UpdatedAt = time.Now()
+	a.CreatedAt = time.Now() 
 }
 
-// validate article
+// cooler validator
 func (a *Article) Validate() error {
-	if a.Title == "" {
-		return errors.New("Title Required")
-	}
-	if a.AuthorID < 0 {
-		return errors.New("Author required")
-	}
-	if a.Body == ""{
-		return errors.New("Article body required")
-	}
-	// HOWEVER, i think body can be null.
-	// incomplete article == draft
-	return nil
+	v := validator.New()  
+	// return v.Struct(a)
+	return v.StructPartial(a,"title", "author_id")
 }
+
 
 
 type ArticlesRepo interface {

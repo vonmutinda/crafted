@@ -58,11 +58,7 @@ func GetArticles(w http.ResponseWriter, r *http.Request){
 	}(repo)
 }
 
-// Delete all articles
-type Ids struct {
-	Id []int
-}
-
+// Delete all articles 
 func DeleteAll(w http.ResponseWriter, r *http.Request){  
 
 	repo := &services.ArticleCRUD{}
@@ -98,6 +94,7 @@ func FetchArticleByID(w http.ResponseWriter, r *http.Request){
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	} 
+ 
 
 	repo := &services.ArticleCRUD{} 
 

@@ -50,7 +50,7 @@ func (repo *ArticleCRUD) SaveArticle(article models.Article) (models.Article, er
 			return
 		} 
 		
-		err = database.GetDB().Model(&models.User{}).Where("id = ?", article.AuthorID).Take(&article.Author).Error
+		err = database.GetDB().Where("id = ?", article.AuthorID).Take(&article.Author).Error
 		if err != nil {
 			log.Println("Error associating author", err)
 			c<- false
@@ -91,7 +91,7 @@ func (repo *ArticleCRUD) FetchArticleByID(id uint64) (models.Article, error){
 	done := make(chan bool)
 
 	go func(c chan<- bool){
-		if err = database.GetDB().Model(&models.Article{}).Where("ID = ?", id).Take(&article).Error; err != nil {
+		if err = database.GetDB().Preload("Author").Where("ID = ?", id).Take(&article).Error; err != nil {
 			log.Println(err)
 			c<- false
 			return

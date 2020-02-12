@@ -1,20 +1,20 @@
 package models
 
-import (
-	"time"
-	"strings"
+import ( 
 	"html"
-	"errors"
 	"log"
+	"strings"
+	"time"
+ 
+	"gopkg.in/go-playground/validator.v9"
 	"github.com/vonmutinda/crafted/api/security"
-	"github.com/badoux/checkmail" 
 )
 
 type User struct {
 	ID 			uint64 		`gorm:"primary_key;AUTO_INCREMENT" json:"id"`
-	Nickname 	string 		`gorm:"size:20;not null,unique" json:"nickname"`
-	Email		string 		`gorm:"size:20;not null,unique" json:"email"`
-	Password	string 		`gorm:"size:60;not null" json:"-"`
+	Nickname 	string 		`gorm:"size:20;not null,unique" json:"nickname" validate:"required"`
+	Email		string 		`gorm:"size:20;not null,unique" json:"email" validate:"required,email"`
+	Password	string 		`gorm:"size:60;not null" json:"-" validate:"required"`
 	CreatedAt	time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt	time.Time 	`gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 	Articles	[]Article	`json:"articles,omitempty"`
@@ -41,43 +41,49 @@ func (u *User) Prepare(){
 	u.UpdatedAt = time.Now()
 }
 
-// validate before save
-func (u *User) Validate(action string) error{
-
-	switch strings.ToLower(action){
-		case "update":
-			if u.Nickname == ""{
-				return errors.New("Required Nickname")
-			} 		
-			if u.Email == ""{
-				return errors.New("Required Email")
-			}
-		
-			if err := checkmail.ValidateFormat(u.Email); err != nil {
-				return errors.New("Invalid Email")
-			}
-			return nil
-		default:
-			if u.Nickname == ""{
-				return errors.New("Required Nickname")
-			}
-		
-			if u.Password == ""{
-				return errors.New("Required Password")
-			}
-		
-			if u.Email == ""{
-				return errors.New("Required Email")
-			}
-		
-			if err := checkmail.ValidateFormat(u.Email); err != nil {
-				return errors.New("Invalid Email")
-			}
-			return nil
-
-	}
-	 
+// cool validator
+func (u *User) Validate() error{
+	v := validator.New()
+	return v.Struct(u)
 }
+
+// validate before save
+// func (u *User) Validate(action string) error{
+
+// 	switch strings.ToLower(action){
+// 		case "update":
+// 			if u.Nickname == ""{
+// 				return errors.New("Required Nickname")
+// 			} 		
+// 			if u.Email == ""{
+// 				return errors.New("Required Email")
+// 			}
+		
+// 			if err := checkmail.ValidateFormat(u.Email); err != nil {
+// 				return errors.New("Invalid Email")
+// 			}
+// 			return nil
+// 		default:
+// 			if u.Nickname == ""{
+// 				return errors.New("Required Nickname")
+// 			}
+		
+// 			if u.Password == ""{
+// 				return errors.New("Required Password")
+// 			}
+		
+// 			if u.Email == ""{
+// 				return errors.New("Required Email")
+// 			}
+		
+// 			if err := checkmail.ValidateFormat(u.Email); err != nil {
+// 				return errors.New("Invalid Email")
+// 			}
+// 			return nil
+
+// 	}
+	 
+// }
 
 
 

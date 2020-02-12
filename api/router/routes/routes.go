@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	
 	"github.com/gorilla/mux"
 	"github.com/vonmutinda/crafted/api/middlewares"
 
@@ -25,7 +26,7 @@ func Load() []Route{
 	for _, k := range routes{
 		AppRoutes = append(AppRoutes, k...) 
 	}
-	
+
 	return AppRoutes
 }
 

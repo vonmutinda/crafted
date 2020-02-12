@@ -22,7 +22,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request){
 	func (repo models.UsersRepo){
 		users, err := repo.FindAll()
 		if err != nil {
-			responses.ERROR(w, http.StatusUnprocessableEntity, err)
+			responses.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
 		responses.JSON(w, http.StatusOK, users)
@@ -35,14 +35,14 @@ func CreateUser(w http.ResponseWriter, r *http.Request){
 
 	user := models.User{}  
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
   
 	
-	user.Prepare()
-	if err := user.Validate(""); err != nil{
-		responses.ERROR(w, http.StatusUnprocessableEntity, err) 
+	user.Prepare() 
+	if err := user.Validate(); err != nil{
+		responses.ERROR(w, http.StatusBadRequest, err) 
 	}
 	
 	rep := &services.UserCRUD{} 
@@ -51,7 +51,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request){
 		user, err := re.Save(user)
 
 		if err != nil {
-			responses.ERROR(w, http.StatusUnprocessableEntity, err)
+			responses.ERROR(w, http.StatusBadRequest, err)
 		}
 
 		w.Header().Set("location", fmt.Sprintf("%s%s/%d", r.Host, r.URL, user.ID)) 
@@ -74,7 +74,7 @@ func GetUser(w http.ResponseWriter, r *http.Request){
 	func (rep models.UsersRepo){
 		user, err := rep.FindById(uid)
 		if err != nil {
-			responses.ERROR(w, http.StatusUnprocessableEntity, err)
+			responses.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
 		responses.JSON(w, http.StatusOK, user)

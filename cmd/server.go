@@ -31,6 +31,7 @@ func init(){
 
 
 func run(){
+
 	config.Load()
 	auto.Load() 
 
@@ -39,17 +40,18 @@ func run(){
 
 	// server configurations
 	s := &http.Server{
-		Addr			: string(config.PORT) ,
+		Addr			: string(config.PORT),
 		Handler  		: r,
 		IdleTimeout		: 1*time.Second,
 		ReadTimeout		: 1*time.Second,
 		WriteTimeout	: 120*time.Second, 
+		MaxHeaderBytes	: 1 << 20,
 	}
 	
 	// server goroutine
 	go func(){ 
 		log.Println(fmt.Sprintf("Server up and running on http://localhost%s", config.PORT))
-		log.Fatal("Go run go!", s.ListenAndServe())
+		log.Fatal("Go run go! ", s.ListenAndServe())
 	}()
 	
 	// for graceful shutdown - channel recieves signal
