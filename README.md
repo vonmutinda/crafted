@@ -1,8 +1,9 @@
 ## Crafted - All about Golang & Microservices
-Let's built a ROBUST microservice as possible. Bringing on board all
-possible awesome technologies on board.
+Let's built a microservice as ROBUST as possible. Bringing on-board all
+possible awesome technologies.
 
-I like simple and that's exactly how we'll do this. ```go #LetThereBeEXCELLENCE```
+I like simple and that's exactly how we'll do this. ```#LetThereBeEXCELLENCE```. 
+Collaboration is totally welcome. It's a great way of learning new stuff along the way.
 
 
 ## Description
@@ -27,8 +28,9 @@ Inspired By [`Washington Redskins`](https://en.wikipedia.org/wiki/Go_Fund_Yourse
 - [ ] Authentication and Authorization Middlewares
 - [ ] GraphQL APIs 
 - [ ] gRPC 
-- [ ] Docker (containerization)
+- [ ] Docker (containerization) 
 - [ ] Service Deployment
+- [ ] Grafana and Prometheus Integrations (Later on)
 
 ## URLS
 
@@ -58,7 +60,9 @@ For set up on your machine .
 docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
 - Since we constantly want to listen for any messages hitting the queue, run the `cobra command`
-`go run main.go consume`.
+```go 
+go run main.go consume
+```
 
 ## Technologies Used 
 Here's a list of technologies used in this project
@@ -81,8 +85,3 @@ Below are helpful resources on where to read more about `Go/Golang`.
 - [Go docs](https://tour.golang.org/)
 - [Go by Example](https://gobyexample.com/)
 - [Nic Jackson](https://www.youtube.com/playlist?list=PLmD8u-IFdreyh6EUfevBcbiuCKzFk0EW_)'s Tutorial Series
-  
-
-
-
-  <!-- http://tumregels.github.io/Network-Programming-with-Go/ -->

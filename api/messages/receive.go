@@ -58,3 +58,9 @@ func Consume(){
 }
  
   
+// UPDATE case_files 
+// SET user_id=NULL, closed=0
+// WHERE updated_at LIKE "2020-02-13 17%"
+
+// DELETE FROM tasks 
+// WHERE created_at LIKE "2020-02-13 17%"
