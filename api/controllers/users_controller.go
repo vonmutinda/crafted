@@ -34,6 +34,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request){
 func CreateUser(w http.ResponseWriter, r *http.Request){ 
 
 	user := models.User{}  
+
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
@@ -52,6 +53,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request){
 
 		if err != nil {
 			responses.ERROR(w, http.StatusBadRequest, err)
+			return
 		}
 
 		w.Header().Set("location", fmt.Sprintf("%s%s/%d", r.Host, r.URL, user.ID)) 

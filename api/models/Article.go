@@ -30,8 +30,7 @@ func (a *Article) Prepare(){
 
 // cooler validator
 func (a *Article) Validate() error {
-	v := validator.New(); 
-	// return v.Struct(a)
+	v := validator.New();  
 	return v.StructPartial(a,"Title", "AuthorID")
 }
 

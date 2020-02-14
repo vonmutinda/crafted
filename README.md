@@ -18,10 +18,11 @@ Just for func
 Inspired By [`Washington Redskins`](https://en.wikipedia.org/wiki/Go_Fund_Yourself)
 
 ## Features
-- [x] GET,POST,PUT,DELETE users and articles
+- [x] RESTful operations
 - [x] DB connection with ```gorm``` and RAW SQL usage alongside [GORM](https://gorm.io)
 - [x] CLI tooling with Cobra 
 - [x] Queues and Messaging with `RabbitMQ`
+- [x] Logging Errors
 
 ## #TODOs
 - [ ] Unit Testing
@@ -32,8 +33,6 @@ Inspired By [`Washington Redskins`](https://en.wikipedia.org/wiki/Go_Fund_Yourse
 - [ ] Service Deployment
 - [ ] Grafana and Prometheus Integrations (Later on)
 
-## URLS
-
 ## Setup Local
 For set up on your machine .
 - Clone the repo `git clone https://github.com/vonmutinda/crafted.git`.
@@ -41,6 +40,7 @@ For set up on your machine .
 - Touch  `.env` file and paste the following configurations.
   
 ### .env file
+
 ```go
     PORT=":9000"
     DB_DRIVER="postgres" # <-provide your own-->
@@ -51,18 +51,40 @@ For set up on your machine .
     DB_PASS="db_pass" # <-provide your own-->
 ```
 
-- If you are using a different `db` from `postgres`, make sure you import its corresponding dialect in `package database`
-- Create `db` and it's name in .env file.
-- Run `go run main.go crafted` or `go build && ./crafted crafted`
-- Install [Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04)
-- Start RabbitMQ container 
-```go 
+If you are using a different `db` from `postgres`, make sure you import its corresponding dialect in `package database`
+
+- MySQL
+```go
+package database
+
+import ( 
+	"github.com/jinzhu/gorm" 
+	_"github.com/jinzhu/gorm/dialects/mysql"
+)
+// rest of code goes here
+```
+
+Create `db` and add it's name in ```.env``` file.
+Run `go run main.go crafted` or `go build && ./crafted crafted`
+
+Install [Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04)
+
+Start RabbitMQ container 
+```cmd 
 docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
 ```
-- Since we constantly want to listen for any messages hitting the queue, run the `cobra command`
-```go 
+
+Since we constantly want to listen for any messages hitting the queue, run the `cobra command`
+```cmd 
 go run main.go consume
 ```
+
+- Logging
+You realise this application is growing too big and once users begin interacting with it in production,
+We'll need a way to know where it fails. 
+
+Later on we'll configure our logger and other parts of our app with [`Prometheus`](https://prometheus.io/) are [Grafana](https://grafana.com/) which are more like [Sentry](https://sentry.io/welcome/) and [Google Analytics](https://analytics.google.com/analytics/web/)
+
 
 ## Technologies Used 
 Here's a list of technologies used in this project
@@ -74,7 +96,7 @@ Here's a list of technologies used in this project
 - [RabbitMQ](https://www.rabbitmq.com/tutorials/tutorial-one-go.html) Messaging and Queues. 
 
 ## NOTES:
-- [x] Use  `SentenceCase` when naming funcs intended for global usage.
+- [x] Use  `Sentence case` when naming funcs intended for global usage.
 - [x] Receivers must be pointers.
 - [x] Channels are used when Feedback is expected from a `go routine`
 - [x] Waitgroups are used when we don't care about Feedback. We only want the job done. 

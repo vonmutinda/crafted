@@ -1,13 +1,13 @@
 package cmd
 
-import (
-	"log"
+import ( 
 
 	"github.com/spf13/cobra"
 	"github.com/vonmutinda/crafted/api/database"
 	"github.com/vonmutinda/crafted/api/messages"
 	"github.com/vonmutinda/crafted/config"
 )
+
 
 var receiveCmd = &cobra.Command{
 	Use: "consume",
@@ -28,7 +28,7 @@ func receive(){
 
 	err := database.Connect() 
 	if err != nil { 
-		log.Fatal(err)
+		// log.Ge
 	}
 
 	messages.Consume()

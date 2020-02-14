@@ -4,24 +4,23 @@ import (
 	"fmt"
 
 	"github.com/streadway/amqp"
+	"github.com/vonmutinda/crafted/api/log" 
 )
+
 
 // init Connection
 func Connect() *amqp.Connection {  
 
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")  
 	if err != nil { 
-		FailOnError(err, "Failed to connect to RabbitMQ")
+		FailOnError(err, "Failed to connect to RabbitMQ") 
 	}
 	return conn
 }
 
 // fail on eror
 func FailOnError(err error, msg string) { 
-
-	if err != nil {
-	  fmt.Printf("%s: %s", msg, err)
-	}
+	log.GetLogger().Info("%s: %s", msg, err)  
 }
 
 // new channel

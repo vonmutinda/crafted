@@ -1,20 +1,21 @@
 package services
 
-import (
-	"fmt"
-	"log"
+import ( 
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"github.com/sirupsen/logrus"
 	"github.com/vonmutinda/crafted/api/channels"
 	"github.com/vonmutinda/crafted/api/database"
 	"github.com/vonmutinda/crafted/api/messages"
 	"github.com/vonmutinda/crafted/api/models"
 )
 
-type ArticleCRUD struct {}
+type ArticleCRUD struct {
+	L *logrus.Logger
+}
  
 
 func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
@@ -29,7 +30,7 @@ func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
 	// go routine to fetch articles
 	go func(c chan<- bool){   
 		if err = database.GetDB().Preload("Author").Find(&articles).Error ; err != nil {
-			fmt.Println(err)
+			repo.L.Error(err)
 		}
 		c<- true 
 	}(done) 
@@ -54,7 +55,7 @@ func (repo *ArticleCRUD) SaveArticle(article models.Article) (models.Article, er
 		
 		err = database.GetDB().Where("id = ?", article.AuthorID).Take(&article.Author).Error
 		if err != nil {
-			log.Println("Error associating author", err)
+			repo.L.Error(err)
 			c<- false
 		}
 		c<- true 
@@ -94,7 +95,7 @@ func (repo *ArticleCRUD) FetchArticleByID(id uint64) (models.Article, error){
 
 	go func(c chan<- bool){
 		if err = database.GetDB().Preload("Author").Where("ID = ?", id).Take(&article).Error; err != nil {
-			log.Println(err)
+			repo.L.Error(err)
 			c<- false
 			return
 		} 
@@ -118,7 +119,7 @@ func (repo *ArticleCRUD) DeleteByID(id uint64) (int64, error){
 
 	done := make(chan int, 1) 
 	go func(c chan<- int){ 
-		rep = database.GetDB().Where("id = ?", id).Delete(&models.Article{})
+		rep = database.GetDB().Where("id = ?", id).Delete(&models.Article{}) 
 		c<- 1
 	}(done)
 
@@ -147,7 +148,7 @@ func(repo *ArticleCRUD) UpdateArticle(updated models.Article, aid int64)(int64, 
 			`,updated.Title,
 			updated.Body,
 			aid,
-		)
+		) 
  
 	}(&wg)
 

@@ -1,0 +1,5 @@
+{"level":"info","msg":"Failed to connect to RabbitMQ: dial tcp 127.0.0.1:5672: connect: connection refused","time":"2020-02-14T12:11:13+03:00"}
+{"level":"info","msg":"Failed to connect to RabbitMQ: dial tcp 127.0.0.1:5672: connect: connection refused","time":"2020-02-14T12:12:42+03:00"}
+{"level":"fatal","msg":"dial tcp 127.0.0.1:5672: connect: connection refused","time":"2020-02-14T12:12:42+03:00"}
+{"level":"info","msg":"%s: %sFailed to connect to RabbitMQdial tcp 127.0.0.1:5672: connect: connection refused","time":"2020-02-14T12:35:24+03:00"}
+{"level":"fatal","msg":"dial tcp 127.0.0.1:5672: connect: connection refused","time":"2020-02-14T12:35:24+03:00"}
