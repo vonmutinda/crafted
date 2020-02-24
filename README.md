@@ -53,7 +53,7 @@ For set up on your machine .
 
 If you are using a different `db` from `postgres`, make sure you import its corresponding dialect in `package database`
 
-- MySQL
+#### MySQL
 ```go
 package database
 
@@ -79,7 +79,7 @@ Since we constantly want to listen for any messages hitting the queue, run the `
 go run main.go consume
 ```
 
-- Logging
+#### Logging
 You realise this application is growing too big and once users begin interacting with it in production,
 We'll need a way to know where it fails. 
 

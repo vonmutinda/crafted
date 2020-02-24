@@ -13,7 +13,7 @@ var (
 )
 
 // load necessary configurations
-func Load(){ 
+func init(){ 
 
 	if err := godotenv.Load(); err != nil {
 		fmt.Printf("Error %s",err)

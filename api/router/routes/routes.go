@@ -8,18 +8,19 @@ import (
 
 )
 
+// Route struct
 type Route struct {
-	Uri 		string
+	URI 		string
 	Method 		string
 	Handler		func(w http.ResponseWriter, r *http.Request)
 }
  
 var routes = [][]Route{ 
 	articleRoutes,
-	UserRoutes,
+	userRoutes,
 }
 
-func Load() []Route{ 
+func load() []Route{ 
 
 	var AppRoutes []Route 
 
@@ -30,15 +31,15 @@ func Load() []Route{
 	return AppRoutes
 }
 
-// NORMALLY ;In gollira mux 
+
+// SetUpRoutesWithMiddlewares NORMALLY ;In gollira mux 
 // m := mux.NewRouter()  <-- m is of type *mux.Router
 // m.HandleFunc("/", Handler).Methods("GET")
-
 func SetUpRoutesWithMiddlewares(r *mux.Router) *mux.Router{
 
-	for _, route := range Load(){
+	for _, route := range load(){
 		r.HandleFunc(
-			route.Uri,
+			route.URI,
 			middlewares.SetUpLoggerMiddleware(
 				middlewares.SetJsonMiddleware(
 					route.Handler,

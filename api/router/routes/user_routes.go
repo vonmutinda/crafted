@@ -5,24 +5,30 @@ import (
 	"github.com/vonmutinda/crafted/api/controllers"
 )
 
-var UserRoutes = []Route{
+
+var userRoutes = []Route{
 	Route{
-		Uri: "/users",
+		URI: "/users",
 		Method: http.MethodGet,
 		Handler: controllers.GetUsers,
 	},
 	Route{
-		Uri: "/users",
+		URI: "/users",
 		Method: http.MethodPost,
 		Handler: controllers.CreateUser,
 	},
 	Route{
-		Uri: "/users/{id}",
+		URI: "/users/{id}",
+		Method: http.MethodGet,
+		Handler: controllers.GetUser,
+	},
+	Route{
+		URI: "/users/{id}",
 		Method: http.MethodPut,
 		Handler: controllers.UpdateUser,
 	},
 	Route{
-		Uri: "/users/{id}",
+		URI: "/users/{id}",
 		Method: http.MethodDelete,
 		Handler: controllers.DeleteUser,
 	},

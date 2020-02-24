@@ -7,38 +7,38 @@ import (
 
 var articleRoutes = []Route{
 	Route{
-		Uri: "/articles",
+		URI: "/articles",
 		Method: http.MethodGet,
 		Handler: controllers.GetArticles,
 	},
 	Route{
-		Uri: "/articles",
+		URI: "/articles",
 		Method: http.MethodPost,
 		Handler: controllers.CreateArticle,
 	},
 	Route{
-		Uri: "/articles/{id}",
+		URI: "/articles/{id}",
 		Method: http.MethodPut,
 		Handler: controllers.UpdateArticle,
 	},
 	Route{
-		Uri: "/articles/{id}",
+		URI: "/articles/{id}",
 		Method: http.MethodGet,
 		Handler: controllers.FetchArticleByID,
 	}, 
 	Route{
-		Uri: "/articles/{id}",
+		URI: "/articles/{id}",
 		Method: http.MethodDelete,
 		Handler: controllers.DeleteArticleByID,
 	},
 	Route{
-		Uri: "/delete",
+		URI: "/delete",
 		Method: http.MethodDelete,
 		Handler: controllers.DeleteAll,
 	},
 
 	Route{
-		Uri: "/delete/{id}",
+		URI: "/delete/{id}",
 		Method: http.MethodDelete,
 		Handler: controllers.DeleteArticleByID,
 	},

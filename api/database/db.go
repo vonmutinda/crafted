@@ -1,11 +1,10 @@
 package database
 
 import (
-	"log"
 	"github.com/jinzhu/gorm"
 	"github.com/vonmutinda/crafted/config"
-	_"github.com/jinzhu/gorm/dialects/postgres"
-
+	"github.com/vonmutinda/crafted/api/log"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 var (
@@ -14,19 +13,18 @@ var (
 	db *gorm.DB
 )
 
-// connect to db
-func Connect() error  {
+// Connect to db
+func init()  {
 
 	db, err = gorm.Open(config.DB_DRIVER, config.DB_URL)
 
-	if err != nil {
-		log.Println("Error connecting to db")
-		return err
+	if err != nil { 
+		 log.GetLogger().Errorf("cannot connect to db :%v",err)
 	}
-
-	return nil
+ 
 }
 
+// GetDB returns db conn
 func GetDB() *gorm.DB{ 
 	return db
 }

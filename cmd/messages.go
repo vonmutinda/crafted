@@ -2,10 +2,9 @@ package cmd
 
 import ( 
 
-	"github.com/spf13/cobra"
-	"github.com/vonmutinda/crafted/api/database"
-	"github.com/vonmutinda/crafted/api/messages"
-	"github.com/vonmutinda/crafted/config"
+	"github.com/spf13/cobra" 
+	// "github.com/vonmutinda/crafted/api/messages"
+	// "github.com/vonmutinda/crafted/config"
 )
 
 
@@ -24,12 +23,7 @@ func init(){
 }
 
 func receive(){  
-	config.Load()
+	// config.Load() 
+	// messages.Consume()
 
-	err := database.Connect() 
-	if err != nil { 
-		// log.Ge
-	}
-
-	messages.Consume()
 }

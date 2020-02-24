@@ -13,7 +13,7 @@ func init() {
 
 	ENV := os.Getenv("ENV")
 
-	// in production 
+	// in dev 
 	if ENV != "production" {
 
 		log.Formatter = &logrus.TextFormatter{
@@ -25,8 +25,7 @@ func init() {
 
 		log.Level = logrus.DebugLevel
 	}
-
-	// in dev  
+  
 	log.Formatter = &logrus.JSONFormatter{} 
 
 	log.SetOutput( &lumberjack.Logger{
@@ -39,8 +38,7 @@ func init() {
 	log.SetLevel(logrus.InfoLevel)
 }
 
-
-func GetLogger() *logrus.Logger {
-
+// GetLogger returns log
+func GetLogger() *logrus.Logger { 
 	return log
 }

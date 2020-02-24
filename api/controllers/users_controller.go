@@ -6,50 +6,57 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/mux" 
+	"github.com/gorilla/mux"
+	"github.com/vonmutinda/crafted/api/database"
+	"github.com/vonmutinda/crafted/api/log"
 	"github.com/vonmutinda/crafted/api/models"
 	"github.com/vonmutinda/crafted/api/responses"
 	"github.com/vonmutinda/crafted/api/services"
 )
+ 
 
-// handleFunc methods
-
-// fetch all useers
+// GetUsers return all useers
 func GetUsers(w http.ResponseWriter, r *http.Request){ 
 
-	rep := &services.UserCRUD{}
+	service := &services.UserService{
+		L: log.GetLogger(),
+		DB: database.GetDB(),
+	}
  
-	func (repo models.UsersRepo){
-		users, err := repo.FindAll()
-		if err != nil {
+	func (servc models.UsersInterface){
+		users, err := servc.FindAll()
+		if err != nil { 
 			responses.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
 		responses.JSON(w, http.StatusOK, users)
 
-	}(rep)
+	}(service)
 }
-
-// Create a new user
+ 
+// CreateUser  new user
 func CreateUser(w http.ResponseWriter, r *http.Request){ 
 
-	user := models.User{}  
+	user := new(models.User)  
 
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(user); err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
   
-	
 	user.Prepare() 
 	if err := user.Validate(); err != nil{
 		responses.ERROR(w, http.StatusBadRequest, err) 
+		return
 	}
 	
-	rep := &services.UserCRUD{} 
+	service := &services.UserService{
+		L: log.GetLogger(),
+		DB: database.GetDB(),
+	} 
 
-	func (re models.UsersRepo){
-		user, err := re.Save(user)
+	func (servc models.UsersInterface){
+		resp, err := servc.Save(user)
 
 		if err != nil {
 			responses.ERROR(w, http.StatusBadRequest, err)
@@ -57,12 +64,12 @@ func CreateUser(w http.ResponseWriter, r *http.Request){
 		}
 
 		w.Header().Set("location", fmt.Sprintf("%s%s/%d", r.Host, r.URL, user.ID)) 
-		responses.JSON(w, http.StatusCreated, user) 
-	}(rep)
+		responses.JSON(w, http.StatusCreated, resp) 
+	}(service)
 
 }
 
-// fetch user by ID
+// GetUser by ID
 func GetUser(w http.ResponseWriter, r *http.Request){
 	vars := mux.Vars(r) 
 
@@ -71,24 +78,30 @@ func GetUser(w http.ResponseWriter, r *http.Request){
 		responses.ERROR(w, http.StatusBadRequest, err)
 	} 
 
-	rep := &services.UserCRUD{}  
+	service := &services.UserService{
+		L: log.GetLogger(),
+		DB: database.GetDB(),
+	}  
 
-	func (rep models.UsersRepo){
-		user, err := rep.FindById(uid)
+	func (servc models.UsersInterface){
+		user, err := servc.FindUserByID(uid)
 		if err != nil {
-			responses.ERROR(w, http.StatusBadRequest, err)
+			responses.ERROR(w, http.StatusNotFound, err)
 			return
 		}
 		responses.JSON(w, http.StatusOK, user)
 
-	}(rep)
+	}(service)
 }
 
+
+// UpdateUser - new info
 func UpdateUser(w http.ResponseWriter, r *http.Request){
 	w.Write( []byte("Update Users") )
 	// user := models.User{} 
 }
 
+// DeleteUser - pass id 
 func DeleteUser(w http.ResponseWriter, r *http.Request){
 	w.Write( []byte("Delete User") )
 }

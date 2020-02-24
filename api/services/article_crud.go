@@ -1,6 +1,6 @@
 package services
 
-import ( 
+import (
 	"strconv"
 	"sync"
 	"time"
@@ -13,24 +13,24 @@ import (
 	"github.com/vonmutinda/crafted/api/models"
 )
 
-type ArticleCRUD struct {
-	L *logrus.Logger
+// ArticleService struct
+type ArticleService struct {
+	L 	*logrus.Logger
+	DB 	*gorm.DB
 }
  
-
-func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
+// GetAllArticles returns all articles
+func (a *ArticleService) GetAllArticles() ([]models.Article, error){
 	var err error
-
-	// articles slice
+ 
 	articles := []models.Article{}
-
-	// channels
+ 
 	done := make(chan bool)
 
 	// go routine to fetch articles
 	go func(c chan<- bool){   
-		if err = database.GetDB().Preload("Author").Find(&articles).Error ; err != nil {
-			repo.L.Error(err)
+		if err = a.DB.Preload("Author").Find(&articles).Error ; err != nil {
+			a.L.Errorf("cannot fetch articles: %v", err)
 		}
 		c<- true 
 	}(done) 
@@ -41,13 +41,13 @@ func (repo *ArticleCRUD) GetAllArticles() ([]models.Article, error){
 	return nil, err
 }
 
-// save a new article 
-func (repo *ArticleCRUD) SaveArticle(article models.Article) (models.Article, error){
+// SaveArticle func
+func (a *ArticleService) SaveArticle(article models.Article) (models.Article, error){
 	var err error 
 	
 	done := make(chan bool)
 	go func(c chan<- bool){
-		err = database.GetDB().Debug().Model(&models.Article{}).Create(&article).Error 
+		err = a.DB.Model(&models.Article{}).Create(&article).Error 
 		if err != nil {  
 			c<- false
 			return
@@ -55,7 +55,7 @@ func (repo *ArticleCRUD) SaveArticle(article models.Article) (models.Article, er
 		
 		err = database.GetDB().Where("id = ?", article.AuthorID).Take(&article.Author).Error
 		if err != nil {
-			repo.L.Error(err)
+			a.L.Errorf("cannot fetch article's author id %d : %v", article.AuthorID)
 			c<- false
 		}
 		c<- true 
@@ -67,8 +67,8 @@ func (repo *ArticleCRUD) SaveArticle(article models.Article) (models.Article, er
 	return models.Article{}, err
 }
 
-// delete all articles 
-func (repo *ArticleCRUD) DeleteAllArticles() (int64, error){
+// DeleteAllArticles func 
+func (a *ArticleService) DeleteAllArticles() (int64, error){
 	// var err error 
 	var rep *gorm.DB
 	done := make(chan int, 1)
@@ -86,16 +86,16 @@ func (repo *ArticleCRUD) DeleteAllArticles() (int64, error){
 	return rep.RowsAffected, rep.Error
 }
 
-// find article by id 
-func (repo *ArticleCRUD) FetchArticleByID(id uint64) (models.Article, error){ 
+// FetchArticleByID func
+func (a *ArticleService) FetchArticleByID(id uint64) (models.Article, error){ 
 
 	var err error 
 	article := models.Article{}  
 	done := make(chan bool)
 
 	go func(c chan<- bool){
-		if err = database.GetDB().Preload("Author").Where("ID = ?", id).Take(&article).Error; err != nil {
-			repo.L.Error(err)
+		if err = a.DB.Preload("Author").Where("ID = ?", id).Take(&article).Error; err != nil {
+			a.L.Errorf("cannot fetch article by id %d : %v", id, err)
 			c<- false
 			return
 		} 
@@ -113,13 +113,13 @@ func (repo *ArticleCRUD) FetchArticleByID(id uint64) (models.Article, error){
 	return models.Article{}, err	
 }
 
-// delete article by ID
-func (repo *ArticleCRUD) DeleteByID(id uint64) (int64, error){ 
+// DeleteByID func
+func (a *ArticleService) DeleteByID(id uint64) (int64, error){ 
 	var rep *gorm.DB
 
 	done := make(chan int, 1) 
 	go func(c chan<- int){ 
-		rep = database.GetDB().Where("id = ?", id).Delete(&models.Article{}) 
+		rep = a.DB.Where("id = ?", id).Delete(&models.Article{}) 
 		c<- 1
 	}(done)
 
@@ -128,8 +128,8 @@ func (repo *ArticleCRUD) DeleteByID(id uint64) (int64, error){
 }
 
 
-// update article - We'll use waitgroups
-func(repo *ArticleCRUD) UpdateArticle(updated models.Article, aid int64)(int64, error){
+// UpdateArticle func 
+func(a *ArticleService) UpdateArticle(updated models.Article, aid int64)(int64, error){
 
 	var gor *gorm.DB
 	var wg sync.WaitGroup 
@@ -140,7 +140,7 @@ func(repo *ArticleCRUD) UpdateArticle(updated models.Article, aid int64)(int64, 
 		defer done.Done()  
 
 		// for testing purpose let's delegate updating time to rabbitmq
-		gor = database.GetDB().Exec(`
+		gor = a.DB.Exec(`
 				UPDATE articles
 				SET title=?,
 					body=?
@@ -149,6 +149,10 @@ func(repo *ArticleCRUD) UpdateArticle(updated models.Article, aid int64)(int64, 
 			updated.Body,
 			aid,
 		) 
+
+		if gor.Error != nil {
+			a.L.Errorf("cannot update article id %d : %v", aid, gor.Error)
+		}
  
 	}(&wg)
 

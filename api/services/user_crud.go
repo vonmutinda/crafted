@@ -2,48 +2,76 @@ package services
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/jinzhu/gorm"
+	"github.com/sirupsen/logrus"
 	"github.com/vonmutinda/crafted/api/channels"
-	"github.com/vonmutinda/crafted/api/database"
 	"github.com/vonmutinda/crafted/api/models"
 )
 
-type UserCRUD struct {}
+// UserService struct
+type UserService struct {
+	L 	*logrus.Logger
+	DB 	*gorm.DB
+}
 
 // Save method of UserRepository interface
-func (r *UserCRUD) Save(user models.User) (models.User, error){
-	var err error 
+func (u *UserService) Save(user *models.User) (*models.User, error){
+	
+	var err error
+	done := make( chan bool) 
 
-	done := make( chan bool)
+	fmt.Printf("incoming user : %v\n", user)
 
-	go func(ch chan<- bool){
-		if err = database.GetDB().Debug().Model(&models.User{}).Create(&user).Error; err != nil {
+	go func(ch chan<- bool){    
+		
+		gor := u.DB.Raw(`
+			INSERT INTO users 
+				(nickname, email, password)
+			VALUES
+				(?, ?, ?) 
+			RETURNING id
+			`,
+			user.Nickname, user.Email, user.Password,
+		).Scan(user) 
+
+		if err = gor.Error; err != nil { 
+			u.L.Errorf("cannot insert new user record : %v", gor.Error)
 			ch<- false
-			return 
-		}
+			return
+		}  
 		ch<- true
+
 	}(done)
 
 	if channels.OK(done){ 
 		return user, nil
 	} 
-	return models.User{}, err
+	return &models.User{}, err
 }
 
-// Fetch all the Users
-func (r *UserCRUD) FindAll() ([]models.User, error){
-	var err error
+// FindAll Fetch all the Users
+func (u *UserService) FindAll() ([]models.User, error){ 
+	
+	var err error 
 
 	users := []models.User{}
 	// a goroutine (channel) for fetching records
 	done := make( chan bool) 
 	go func(ch chan<- bool){
-		if err = database.GetDB().Model(&models.User{}).Limit(50).Find(&users).Error; err != nil {
+
+		gor := u.DB.Raw(`
+			SELECT * FROM users LIMIT 50
+		`).Scan(&users)
+
+		if err = gor.Error; err != nil {
+			u.L.Errorf("cannot find all users : %v", err) 
 			ch<- false
-			return 
-		}
-		ch<- true
+			return
+		} 
+
+		ch<- true 
 	}(done)
 
 	if channels.OK(done){
@@ -52,19 +80,28 @@ func (r *UserCRUD) FindAll() ([]models.User, error){
 	return nil, err
 }
 
-// Fetch all the Users
-func (r *UserCRUD) FindById(uid uint64) ( models.User, error){
-	var err error
+// FindUserByID Fetch user by id
+func (u *UserService)FindUserByID(uid uint64) ( models.User, error){
 
+	var err error  
 	user := models.User{}
+
 	// a goroutine (channel) for fetching records
 	done := make(chan bool) 
-	go func(ch chan<- bool){
-		if err = database.GetDB().Debug().Model(&models.User{}).Where("id = ?", uid).Take(&user).Error; err != nil {
+	go func(ch chan<- bool){ 
+
+		gor := u.DB.Raw(`
+			SELECT * FROM users WHERE id=?
+			`, uid,
+		).Scan(&user) 
+
+		if err = gor.Error; err != nil {
+			u.L.Errorf("cannot fetch user by id %d : %v", uid, gor.Error)
 			ch<- false
-			return 
+			return  
 		}
 		ch<- true
+
 	}(done)
 
 	if channels.OK(done) {

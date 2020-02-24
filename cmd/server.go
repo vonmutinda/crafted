@@ -30,9 +30,7 @@ func init(){
 }
 
 
-func run(){
-
-	config.Load()
+func run(){ 
 	auto.Load() 
 
 	// set routes 

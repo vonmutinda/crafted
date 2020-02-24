@@ -8,7 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-
+// Article struct
 type Article struct {
 	ID				uint64  	`gorm:"primary_key;AUTO_INCREMENT" json:"id"`
 	Title			string		`gorm:"size:250;not_null;unique" json:"title" validate:"required"`
@@ -20,7 +20,7 @@ type Article struct {
 	DeletedAt		*time.Time	`json:"deleted_at,omitempty" sql:"index"`
 }
 
-// prepare 
+// Prepare func
 func (a *Article) Prepare(){ 
 	a.ID = 0
 	a.Title = html.EscapeString(strings.TrimSpace(a.Title))
@@ -28,15 +28,14 @@ func (a *Article) Prepare(){
 	a.CreatedAt = time.Now() 
 }
 
-// cooler validator
+// Validate cooler one
 func (a *Article) Validate() error {
 	v := validator.New();  
 	return v.StructPartial(a,"Title", "AuthorID")
 }
 
-
-
-type ArticlesRepo interface {
+// ArticleInterface -
+type ArticleInterface interface {
 	GetAllArticles()([]Article, error)
 	SaveArticle(Article) (Article, error)
 	FetchArticleByID(id uint64) (Article, error)
