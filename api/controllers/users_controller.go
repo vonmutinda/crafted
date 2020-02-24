@@ -19,8 +19,8 @@ import (
 func GetUsers(w http.ResponseWriter, r *http.Request){ 
 
 	service := &services.UserService{
-		L: log.GetLogger(),
-		DB: database.GetDB(),
+		Logger : log.GetLogger(),
+		DB : database.GetDB(),
 	}
  
 	func (servc models.UsersInterface){
@@ -51,8 +51,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request){
 	}
 	
 	service := &services.UserService{
-		L: log.GetLogger(),
-		DB: database.GetDB(),
+		Logger : log.GetLogger(),
+		DB : database.GetDB(),
 	} 
 
 	func (servc models.UsersInterface){
@@ -79,7 +79,7 @@ func GetUser(w http.ResponseWriter, r *http.Request){
 	} 
 
 	service := &services.UserService{
-		L: log.GetLogger(),
+		Logger :log.GetLogger(),
 		DB: database.GetDB(),
 	}  
 

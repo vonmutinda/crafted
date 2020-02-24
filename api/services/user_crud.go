@@ -1,8 +1,7 @@
 package services 
 
 import (
-	"errors"
-	"fmt"
+	"errors" 
 
 	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
@@ -12,17 +11,15 @@ import (
 
 // UserService struct
 type UserService struct {
-	L 	*logrus.Logger
-	DB 	*gorm.DB
+	Logger 	*logrus.Logger
+	DB 		*gorm.DB
 }
 
 // Save method of UserRepository interface
 func (u *UserService) Save(user *models.User) (*models.User, error){
 	
 	var err error
-	done := make( chan bool) 
-
-	fmt.Printf("incoming user : %v\n", user)
+	done := make( chan bool)  
 
 	go func(ch chan<- bool){    
 		
@@ -37,7 +34,7 @@ func (u *UserService) Save(user *models.User) (*models.User, error){
 		).Scan(user) 
 
 		if err = gor.Error; err != nil { 
-			u.L.Errorf("cannot insert new user record : %v", gor.Error)
+			u.Logger.Errorf("cannot insert new user record : %v", gor.Error)
 			ch<- false
 			return
 		}  
@@ -66,7 +63,7 @@ func (u *UserService) FindAll() ([]models.User, error){
 		`).Scan(&users)
 
 		if err = gor.Error; err != nil {
-			u.L.Errorf("cannot find all users : %v", err) 
+			u.Logger.Errorf("cannot find all users : %v", err) 
 			ch<- false
 			return
 		} 
@@ -96,7 +93,7 @@ func (u *UserService)FindUserByID(uid uint64) ( models.User, error){
 		).Scan(&user) 
 
 		if err = gor.Error; err != nil {
-			u.L.Errorf("cannot fetch user by id %d : %v", uid, gor.Error)
+			u.Logger.Errorf("cannot fetch user by id %d : %v", uid, gor.Error)
 			ch<- false
 			return  
 		}

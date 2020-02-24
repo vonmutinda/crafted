@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/vonmutinda/crafted/api/database"
 	"github.com/vonmutinda/crafted/api/log"
 	"github.com/vonmutinda/crafted/api/models"
 	"github.com/vonmutinda/crafted/api/responses"
@@ -16,9 +17,9 @@ import (
 // CreateArticle new article
 func CreateArticle(w http.ResponseWriter, r *http.Request){ 
  
-	article := models.Article{}
+	article := new(models.Article)
 
-	if err := json.NewDecoder(r.Body).Decode(&article); err != nil{
+	if err := json.NewDecoder(r.Body).Decode(article); err != nil{
 		responses.ERROR(w,http.StatusUnprocessableEntity, err)
 		return
 	} 
@@ -32,7 +33,8 @@ func CreateArticle(w http.ResponseWriter, r *http.Request){
 	}
 
 	service := &services.ArticleService{ 
-		L: log.GetLogger(),
+		Logger: log.GetLogger(),
+		DB: database.GetDB(),
 	}
 
 	func (servc models.ArticleInterface){ 
@@ -48,7 +50,10 @@ func CreateArticle(w http.ResponseWriter, r *http.Request){
 // GetArticles --FetchAll articles
 func GetArticles(w http.ResponseWriter, r *http.Request){  
 
-	service := &services.ArticleService{}
+	service := &services.ArticleService{
+		Logger: log.GetLogger(),
+		DB:  database.GetDB(),
+	}
 
 	func (servc models.ArticleInterface){
 		a, e := servc.GetAllArticles()
@@ -65,7 +70,10 @@ func GetArticles(w http.ResponseWriter, r *http.Request){
 // DeleteAll - articles
 func DeleteAll(w http.ResponseWriter, r *http.Request){  
 
-	service := &services.ArticleService{}
+	service := &services.ArticleService{
+		Logger: log.GetLogger(),
+		DB: database.GetDB(),
+	}
 
 	func (servc models.ArticleInterface){ 
 		ra, err := servc.DeleteAllArticles()
@@ -98,9 +106,11 @@ func FetchArticleByID(w http.ResponseWriter, r *http.Request){
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	} 
- 
-
-	repo := &services.ArticleService{ } 
+  
+	repo := &services.ArticleService{
+		Logger: log.GetLogger(),
+		DB: database.GetDB(),
+	} 
 
 	func (rep models.ArticleInterface){
 		article, err := rep.FetchArticleByID(id)
@@ -124,10 +134,13 @@ func DeleteArticleByID(w http.ResponseWriter, r *http.Request){
 		return
 	} 
 
-	rep := &services.ArticleService{} 
+	rep := &services.ArticleService{
+		Logger : log.GetLogger(),
+		DB : database.GetDB(),
+	} 
 
 	func (repo models.ArticleInterface){
-		ra, err := repo.DeleteByID(id) 
+		err := repo.DeleteByID(id) 
 		if err != nil { 
 
 			responses.ERROR(w, http.StatusUnprocessableEntity, err)
@@ -140,7 +153,7 @@ func DeleteArticleByID(w http.ResponseWriter, r *http.Request){
 			struct{
 				Status string `json:"status"`
 			}{
-				Status: fmt.Sprintf("OK %d Records Deleted!", ra),
+				Status: fmt.Sprintf("ok Record Deleted!"),
 			},
 		)
 	}(rep)
@@ -159,15 +172,18 @@ func UpdateArticle(w http.ResponseWriter, r *http.Request){
 	}
 
 	// decode payload 
-	newData := models.Article{}
+	newData := new(models.Article)
 
-	if err := json.NewDecoder(r.Body).Decode(&newData); err != nil{
+	if err := json.NewDecoder(r.Body).Decode(newData); err != nil{
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
 	}
 
 	// update 
-	repo := &services.ArticleService{} 
+	repo := &services.ArticleService{
+		Logger : log.GetLogger(),
+		DB : database.GetDB(),
+	} 
 
 	func(re models.ArticleInterface){
 
@@ -179,7 +195,7 @@ func UpdateArticle(w http.ResponseWriter, r *http.Request){
 			return
 		} 
 
-		responses.JSON(w, http.StatusOK, fmt.Sprintf("%d record(s) affected",a))
+		responses.JSON(w, http.StatusOK, a)
 
 	}(repo)
 }

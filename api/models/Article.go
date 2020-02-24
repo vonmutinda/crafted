@@ -37,9 +37,9 @@ func (a *Article) Validate() error {
 // ArticleInterface -
 type ArticleInterface interface {
 	GetAllArticles()([]Article, error)
-	SaveArticle(Article) (Article, error)
+	SaveArticle(a *Article) (*Article, error)
 	FetchArticleByID(id uint64) (Article, error)
-	DeleteByID(id uint64) (int64, error)
-	UpdateArticle(a Article, id int64)(int64, error) 
+	DeleteByID(id uint64) (error)
+	UpdateArticle(a *Article, id int64)(*Article, error) 
 	DeleteAllArticles() (int64, error)
 }

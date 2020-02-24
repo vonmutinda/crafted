@@ -15,7 +15,7 @@ import (
 
 // ArticleService struct
 type ArticleService struct {
-	L 	*logrus.Logger
+	Logger 	*logrus.Logger
 	DB 	*gorm.DB
 }
  
@@ -30,7 +30,7 @@ func (a *ArticleService) GetAllArticles() ([]models.Article, error){
 	// go routine to fetch articles
 	go func(c chan<- bool){   
 		if err = a.DB.Preload("Author").Find(&articles).Error ; err != nil {
-			a.L.Errorf("cannot fetch articles: %v", err)
+			a.Logger.Errorf("cannot fetch articles: %v", err)
 		}
 		c<- true 
 	}(done) 
@@ -42,7 +42,7 @@ func (a *ArticleService) GetAllArticles() ([]models.Article, error){
 }
 
 // SaveArticle func
-func (a *ArticleService) SaveArticle(article models.Article) (models.Article, error){
+func (a *ArticleService) SaveArticle(article *models.Article) (*models.Article, error){
 	var err error 
 	
 	done := make(chan bool)
@@ -55,7 +55,7 @@ func (a *ArticleService) SaveArticle(article models.Article) (models.Article, er
 		
 		err = database.GetDB().Where("id = ?", article.AuthorID).Take(&article.Author).Error
 		if err != nil {
-			a.L.Errorf("cannot fetch article's author id %d : %v", article.AuthorID)
+			a.Logger.Errorf("cannot fetch article's author id %d : %v", article.AuthorID)
 			c<- false
 		}
 		c<- true 
@@ -64,7 +64,7 @@ func (a *ArticleService) SaveArticle(article models.Article) (models.Article, er
 	if channels.OK(done){ 
 		return article,nil 
 	}
-	return models.Article{}, err
+	return &models.Article{}, err
 }
 
 // DeleteAllArticles func 
@@ -95,7 +95,7 @@ func (a *ArticleService) FetchArticleByID(id uint64) (models.Article, error){
 
 	go func(c chan<- bool){
 		if err = a.DB.Preload("Author").Where("ID = ?", id).Take(&article).Error; err != nil {
-			a.L.Errorf("cannot fetch article by id %d : %v", id, err)
+			a.Logger.Errorf("cannot fetch article by id %d : %v", id, err)
 			c<- false
 			return
 		} 
@@ -114,33 +114,42 @@ func (a *ArticleService) FetchArticleByID(id uint64) (models.Article, error){
 }
 
 // DeleteByID func
-func (a *ArticleService) DeleteByID(id uint64) (int64, error){ 
-	var rep *gorm.DB
+func (a *ArticleService) DeleteByID(id uint64) error { 
+	 
+	var err error  
+	done := make(chan int, 1) // buffered channel
 
-	done := make(chan int, 1) 
 	go func(c chan<- int){ 
-		rep = a.DB.Where("id = ?", id).Delete(&models.Article{}) 
+		err = a.DB.Exec(`
+			DELETE FROM articles 
+			WHERE id = ?
+		`, id).Error
+
+		if err != nil {
+			a.Logger.Errorf("cannot delete article id : %d", id)
+		}
+
 		c<- 1
 	}(done)
 
 	<-done 
-	return rep.RowsAffected, rep.Error 
+	return err
 }
 
 
 // UpdateArticle func 
-func(a *ArticleService) UpdateArticle(updated models.Article, aid int64)(int64, error){
+// using wait groups for fun !!!! 
+func(a *ArticleService) UpdateArticle(updated *models.Article, aid int64) (*models.Article, error) {
 
-	var gor *gorm.DB
-	var wg sync.WaitGroup 
+	var wg sync.WaitGroup  
+	var err error
 
 	wg.Add(1)
 	go func(done *sync.WaitGroup){
 
-		defer done.Done()  
-
+		defer done.Done()   
 		// for testing purpose let's delegate updating time to rabbitmq
-		gor = a.DB.Exec(`
+		gor := a.DB.Exec(`
 				UPDATE articles
 				SET title=?,
 					body=?
@@ -150,17 +159,17 @@ func(a *ArticleService) UpdateArticle(updated models.Article, aid int64)(int64, 
 			aid,
 		) 
 
-		if gor.Error != nil {
-			a.L.Errorf("cannot update article id %d : %v", aid, gor.Error)
+		if err =  gor.Error; err != nil {
+			a.Logger.Errorf("cannot update article id %d : %v", aid, err)  
 		}
  
 	}(&wg)
 
 	wg.Wait() 
 	
-	// send to queue 
+	// send to queue -- for fun again!!! 
 	s := strconv.FormatInt(aid, 10)
 	messages.SendMessage("updated_at", s)
 
-	return gor.RowsAffected, gor.Error
+	return updated, err
 } 
