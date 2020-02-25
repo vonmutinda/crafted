@@ -18,6 +18,7 @@ type Route struct {
 var routes = [][]Route{ 
 	articleRoutes,
 	userRoutes,
+	authRoutes,
 }
 
 func load() []Route{ 

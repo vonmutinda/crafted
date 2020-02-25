@@ -43,16 +43,19 @@ func (a *ArticleService) GetAllArticles() ([]models.Article, error){
 
 // SaveArticle func
 func (a *ArticleService) SaveArticle(article *models.Article) (*models.Article, error){
-	var err error 
 	
+	var err error  
 	done := make(chan bool)
-	go func(c chan<- bool){
-		err = a.DB.Model(&models.Article{}).Create(&article).Error 
-		if err != nil {  
+
+	go func(c chan<- bool){ 
+
+		gor := a.DB.Save(article)
+		
+		if err = gor.Error; err != nil {  
 			c<- false
 			return
 		} 
-		
+
 		err = database.GetDB().Where("id = ?", article.AuthorID).Take(&article.Author).Error
 		if err != nil {
 			a.Logger.Errorf("cannot fetch article's author id %d : %v", article.AuthorID)

@@ -1,9 +1,11 @@
 package config 
 
 import (
-	"github.com/joho/godotenv"
-	"os"
 	"fmt"
+	"os"
+
+	"github.com/joho/godotenv"
+	"github.com/vonmutinda/crafted/api/log"
 )
 
 var ( 
@@ -17,7 +19,7 @@ var (
 func init(){ 
 
 	if err := godotenv.Load(); err != nil {
-		fmt.Printf("Error %s",err)
+		log.GetLogger().Errorf("cannot load .env file : %v", err) 
 		PORT = ":9000"
 	}
 
@@ -31,7 +33,7 @@ func init(){
 		os.Getenv("DB_PASS"),
 	)
 	
-	DB_DRIVER=os.Getenv("DB_DRIVER")
+	DB_DRIVER = os.Getenv("DB_DRIVER")
 
-	SECRET_KEY= []byte(os.Getenv("API_SECRET"))
+	SECRET_KEY = []byte(os.Getenv("API_SECRET")) 	
 }

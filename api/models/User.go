@@ -40,6 +40,8 @@ func (u *User) Prepare(){
 }
 
 // Validate - cool validator
+// TODO : use case switch statement to validate for various
+// scenarios - when loggin in, creating user etc. 
 func (u *User) Validate() error{
 	v := validator.New()
 	return v.Struct(u)
@@ -52,5 +54,10 @@ type UsersInterface interface {
 	FindUserByID(uint64)(User, error)
 	// Update(uint32, models.User) (uint64, error)
 	// Delete(uint32) (uint64, error)
-	// DeleteAll() (error)
+	// DeleteAll() (error) 
+}
+
+// AuthInterface -
+type AuthInterface interface {
+	SignIn(string, string)(string, error)
 }

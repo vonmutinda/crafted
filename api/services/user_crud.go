@@ -19,19 +19,11 @@ type UserService struct {
 func (u *UserService) Save(user *models.User) (*models.User, error){
 	
 	var err error
-	done := make( chan bool)  
+	done := make( chan bool)   
 
 	go func(ch chan<- bool){    
 		
-		gor := u.DB.Raw(`
-			INSERT INTO users 
-				(nickname, email, password)
-			VALUES
-				(?, ?, ?) 
-			RETURNING id
-			`,
-			user.Nickname, user.Email, user.Password,
-		).Scan(user) 
+		gor := u.DB.Save(user)
 
 		if err = gor.Error; err != nil { 
 			u.Logger.Errorf("cannot insert new user record : %v", gor.Error)
