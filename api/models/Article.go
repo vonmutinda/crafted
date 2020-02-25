@@ -21,11 +21,9 @@ type Article struct {
 }
 
 // Prepare func
-func (a *Article) Prepare(){ 
-	a.ID = 0
+func (a *Article) Prepare(){  
 	a.Title = html.EscapeString(strings.TrimSpace(a.Title))
-	a.Body = html.EscapeString(strings.TrimSpace(a.Body))
-	a.CreatedAt = time.Now() 
+	a.Body = html.EscapeString(strings.TrimSpace(a.Body)) 
 }
 
 // Validate cooler one

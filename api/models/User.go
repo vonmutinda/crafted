@@ -34,11 +34,9 @@ func (u *User) BeforeSave() error {
 }
 
 // Prepare method 
-func (u *User) Prepare(){
-	u.ID = 0
+func (u *User) Prepare(){ 
 	u.Nickname = html.EscapeString( strings.TrimSpace(u.Nickname) )
-	u.Email = html.EscapeString(strings.TrimSpace(u.Email))
-	u.CreatedAt = time.Now() 
+	u.Email = html.EscapeString(strings.TrimSpace(u.Email)) 
 }
 
 // Validate - cool validator

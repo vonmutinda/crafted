@@ -23,12 +23,12 @@ Inspired By [`Washington Redskins`](https://en.wikipedia.org/wiki/Go_Fund_Yourse
 - [x] CLI tooling with Cobra 
 - [x] Queues and Messaging with `RabbitMQ`
 - [x] Logging Errors
+- [x] Authentication and Authorization Middlewares
 
 ## #TODOs
 - [ ] Unit Testing
-- [ ] Authentication and Authorization Middlewares
 - [ ] GraphQL APIs 
-- [ ] gRPC 
+- [ ] gRPC  
 - [ ] Docker (containerization) 
 - [ ] Service Deployment
 - [ ] Grafana and Prometheus Integrations (Later on)
@@ -43,12 +43,20 @@ For set up on your machine .
 
 ```go
     PORT=":9000"
+
     DB_DRIVER="postgres" # <-provide your own-->
+
     DB_HOST="localhost"
+
     DB_PORT="5432"
+
     DB_USER="username" # <-provide your own-->
+
     DB_NAME="db_name" # <-provide your own-->
+
     DB_PASS="db_pass" # <-provide your own-->
+
+    API_SECRET="ajsdlfjeo129pusfgan309rudlnlh34ouofOU&)O&UO#jr"  # can you keep a secret?
 ```
 
 If you are using a different `db` from `postgres`, make sure you import its corresponding dialect in `package database`
