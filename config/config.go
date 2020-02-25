@@ -6,10 +6,11 @@ import (
 	"fmt"
 )
 
-var (
-	PORT =""
-	DB_URL =""
-	DB_DRIVER =""
+var ( 
+	PORT = "" 
+	DB_URL = "" 
+	DB_DRIVER = ""
+	SECRET_KEY []byte
 )
 
 // load necessary configurations
@@ -31,4 +32,6 @@ func init(){
 	)
 	
 	DB_DRIVER=os.Getenv("DB_DRIVER")
+
+	SECRET_KEY= []byte(os.Getenv("API_SECRET"))
 }
