@@ -1,15 +1,14 @@
 package services
 
 import (
-	"strconv"
+	"errors" 
 	"sync"
 	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 	"github.com/vonmutinda/crafted/api/channels"
-	"github.com/vonmutinda/crafted/api/database"
-	"github.com/vonmutinda/crafted/api/messages"
+	"github.com/vonmutinda/crafted/api/database" 
 	"github.com/vonmutinda/crafted/api/models"
 )
 
@@ -117,62 +116,61 @@ func (a *ArticleService) FetchArticleByID(id uint64) (models.Article, error){
 }
 
 // DeleteByID func
-func (a *ArticleService) DeleteByID(id uint64) error { 
+func (a *ArticleService) DeleteByID(id uint64, uid uint64) (int64, error) { 
 	 
 	var err error  
+	var gor *gorm.DB
 	done := make(chan int, 1) // buffered channel
 
 	go func(c chan<- int){ 
-		err = a.DB.Exec(`
+		gor = a.DB.Exec(`
 			DELETE FROM articles 
-			WHERE id = ?
-		`, id).Error
+			WHERE id = ? AND author_id = ?
+		`, id, uid)
 
-		if err != nil {
+		if err = gor.Error; err != nil {
 			a.Logger.Errorf("cannot delete article id : %d", id)
 		}
 
 		c<- 1
-	}(done)
+	}(done) 
 
 	<-done 
-	return err
+
+	if gor.RowsAffected == 0 {
+		return 0, errors.New("record doesn't exist")
+	}
+	return gor.RowsAffected, err
 }
 
 
 // UpdateArticle func 
 // using wait groups for fun !!!! 
-func(a *ArticleService) UpdateArticle(updated *models.Article, aid int64) (*models.Article, error) {
+func(a *ArticleService) UpdateArticle(updated *models.Article, aid int64, uid uint64) (int64, error) {
 
 	var wg sync.WaitGroup  
+	var gor *gorm.DB
 	var err error
 
 	wg.Add(1)
 	go func(done *sync.WaitGroup){
 
-		defer done.Done()   
-		// for testing purpose let's delegate updating time to rabbitmq
-		gor := a.DB.Exec(`
-				UPDATE articles
-				SET title=?,
-					body=?
-				WHERE id=?
-			`,updated.Title,
-			updated.Body,
-			aid,
-		) 
-
+		defer done.Done()    
+		gor = a.DB.Exec(`
+			UPDATE articles 
+			SET title=?,body=?,updated_at=? 
+			WHERE id=? AND author_id=? 
+			`,
+			updated.Title, updated.Body, time.Now(), aid, uid,
+		)
+ 
 		if err =  gor.Error; err != nil {
 			a.Logger.Errorf("cannot update article id %d : %v", aid, err)  
-		}
+		} 
  
 	}(&wg)
 
 	wg.Wait() 
-	
-	// send to queue -- for fun again!!! 
-	s := strconv.FormatInt(aid, 10)
-	messages.SendMessage("updated_at", s)
-
-	return updated, err
+	 
+	return gor.RowsAffected, err
 } 

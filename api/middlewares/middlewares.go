@@ -8,13 +8,19 @@ import (
 
 	"github.com/vonmutinda/crafted/api/auth"
 	"github.com/vonmutinda/crafted/api/responses"
+	logger "github.com/vonmutinda/crafted/api/log"
 )
 
 // SetUpLoggerMiddleware -log details of every request
 func SetUpLoggerMiddleware(next http.HandlerFunc) http.HandlerFunc{
 
 	return func(w http.ResponseWriter, r *http.Request){
-		log.Println( fmt.Sprintf("%s %s%s %s", r.Method, r.Host, r.RequestURI, r.Proto) )
+
+		entry := fmt.Sprintf("%s %s%s %s", r.Method, r.Host, r.RequestURI, r.Proto)
+		
+		log.Println(entry)
+		logger.GetLogger().Info(fmt.Sprintf("%s %s%s %s", r.Method, r.Host, r.RequestURI, r.Proto))
+
 		next(w,r)
 	}
 }
@@ -33,14 +39,12 @@ func SetAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request){
 
-		err := auth.TokenValid(r)  
-
-		if err != nil { 
-			fmt.Printf("token not valid : %v",err) 
-			responses.ERROR(w, http.StatusUnauthorized, errors.New("unauthorised"))
+		err := auth.TokenValid(r)   
+		if err != nil {  
+			logger.GetLogger().Errorf("submitted token not valid :%v\n",err)  
+			responses.ERROR(w, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)))
 			return
-		} 
-
+		}  
 		next(w, r)
 	}
 }

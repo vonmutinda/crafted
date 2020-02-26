@@ -62,8 +62,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request){
 			responses.ERROR(w, http.StatusBadRequest, err)
 			return
 		}
-
-		w.Header().Set("location", fmt.Sprintf("%s%s/%d", r.Host, r.URL, user.ID)) 
+		w.Header().Set("Location", fmt.Sprintf("%s%s",r.Host, r.RequestURI)) 
 		responses.JSON(w, http.StatusCreated, resp) 
 	}(service)
 
@@ -98,11 +97,13 @@ func GetUser(w http.ResponseWriter, r *http.Request){
 // UpdateUser - new info
 func UpdateUser(w http.ResponseWriter, r *http.Request){
 	w.Write( []byte("Update Users") )
+	// w.Header().Set("Location", fmt.Sprintf("%s %s%s %s", r.Method, r.Host, r.RequestURI, r.Proto))
 	// user := models.User{} 
 }
 
 // DeleteUser - pass id 
 func DeleteUser(w http.ResponseWriter, r *http.Request){
 	w.Write( []byte("Delete User") )
+	// w.Header().Set("Entity", fmt.Sprintf("%d", id))
 }
 

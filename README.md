@@ -4,7 +4,9 @@ possible awesome technologies.
 
 I like simple and that's exactly how we'll do this. ```#LetThereBeEXCELLENCE```. 
 Collaboration is totally welcome. It's a great way of learning new stuff along the way.
-
+```go
+simple is better than comlex - always
+```
 
 ## Description
 Just for func
@@ -21,7 +23,7 @@ Inspired By [`Washington Redskins`](https://en.wikipedia.org/wiki/Go_Fund_Yourse
 - [x] RESTful operations
 - [x] DB connection with ```gorm``` and RAW SQL usage alongside [GORM](https://gorm.io)
 - [x] CLI tooling with Cobra 
-- [x] Queues and Messaging with `RabbitMQ`
+- [x] Queues and Messaging with `RabbitMQ` (unneccessary though)
 - [x] Logging Errors
 - [x] Authentication and Authorization Middlewares
 
@@ -102,6 +104,7 @@ Here's a list of technologies used in this project
 - [gorilla/mux HTTP framework](https://github.com/gorilla/mux). You could as well use [Gin](https://github.com/gin-gonic/gin)
 - [Gorm ORM](https://gorm.io/). However I'd highly recommend writing raw SQL.
 - [RabbitMQ](https://www.rabbitmq.com/tutorials/tutorial-one-go.html) Messaging and Queues. 
+- [JWT](https://github.com/dgrijalva/jwt-go) (JSON Web Tokens)
 
 ## NOTES:
 - [x] Use  `Sentence case` when naming funcs intended for global usage.

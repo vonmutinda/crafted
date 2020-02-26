@@ -23,7 +23,7 @@ type Article struct {
 // Prepare func
 func (a *Article) Prepare(){  
 	a.Title = html.EscapeString(strings.TrimSpace(a.Title))
-	a.Body = html.EscapeString(strings.TrimSpace(a.Body)) 
+	a.Body = html.EscapeString(strings.TrimSpace(a.Body))  
 }
 
 // Validate cooler one
@@ -37,7 +37,7 @@ type ArticleInterface interface {
 	GetAllArticles()([]Article, error)
 	SaveArticle(a *Article) (*Article, error)
 	FetchArticleByID(id uint64) (Article, error)
-	DeleteByID(id uint64) (error)
-	UpdateArticle(a *Article, id int64)(*Article, error) 
+	DeleteByID(id uint64, uid uint64) (int64, error)
+	UpdateArticle(a *Article, id int64, uid uint64)(int64, error) 
 	DeleteAllArticles() (int64, error)
 }
