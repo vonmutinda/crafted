@@ -34,7 +34,7 @@ func run(){
 	auto.Load() 
 
 	// set routes 
-	r := router.New()
+	r := router.LoadCORS(router.New())
 
 	// server configurations
 	s := &http.Server{

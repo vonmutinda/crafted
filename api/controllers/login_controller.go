@@ -43,7 +43,7 @@ func Login(w http.ResponseWriter, r *http.Request){
 			responses.ERROR(w, http.StatusNotFound, err)
 			return
 		} 
-		responses.JSON(w, http.StatusOK, token) 
+		responses.JSON(w, http.StatusOK, struct{Token string `json:"token"`}{Token: token}) 
 	}(service)
 
 }
