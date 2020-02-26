@@ -10,9 +10,10 @@ import (
 
 // Route struct
 type Route struct {
-	URI 		string
-	Method 		string
-	Handler		func(w http.ResponseWriter, r *http.Request)
+	URI 			string
+	Method 			string
+	Handler			func(w http.ResponseWriter, r *http.Request)
+	AuthRequired 	bool
 }
  
 var routes = [][]Route{ 
@@ -38,17 +39,32 @@ func load() []Route{
 // m.HandleFunc("/", Handler).Methods("GET")
 func SetUpRoutesWithMiddlewares(r *mux.Router) *mux.Router{
 
-	for _, route := range load(){
-		r.HandleFunc(
-			route.URI,
-			middlewares.SetUpLoggerMiddleware(
-				middlewares.SetJsonMiddleware(
-					route.Handler,
+	for _, route := range load(){ 
+
+		// if you know of a better way to Use the auth middleware
+		// kindly let me know
+		if route.AuthRequired {
+
+			r.HandleFunc(
+				route.URI,
+				middlewares.SetUpLoggerMiddleware(
+					middlewares.SetJSONMiddleware(
+						middlewares.SetAuthMiddleware(route.Handler),
+					),
+				), 
+			).Methods(route.Method)
+
+		}else {
+
+			r.HandleFunc(
+				route.URI,
+				middlewares.SetUpLoggerMiddleware(
+					middlewares.SetJSONMiddleware(route.Handler),
 				),
-			), 
-		).Methods(route.Method)
+			).Methods(route.Method)
+		}
+ 
 	}
 
 	return r
-
 }

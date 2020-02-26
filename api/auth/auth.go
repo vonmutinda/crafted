@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"errors"
+
 	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
 	"github.com/vonmutinda/crafted/api/models"
@@ -33,7 +35,7 @@ func (a *Auth)SignIn(email string, password string)(string, error) {
 
 	if err != nil {
 		a.Logger.Errorf("cannot verify password : %v", err)
-		return "", err
+		return "", errors.New("Password does not match")
 	}
 
 	return CreateToken(user.ID)

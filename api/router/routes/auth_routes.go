@@ -11,5 +11,6 @@ var authRoutes = []Route{
 		URI: "/login",
 		Method: http.MethodPost,
 		Handler: controllers.Login,
+		AuthRequired: false,
 	},
 }
