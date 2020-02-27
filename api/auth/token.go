@@ -68,7 +68,7 @@ func TokenValid(r *http.Request) error {
 	return nil
 } 
 
-// TokenID - extract ID 
+// TokenID - extract UserID 
 func TokenID(r *http.Request)(uint64, error){
 
 	tokenString := ExtractToken(r) 
@@ -84,16 +84,13 @@ func TokenID(r *http.Request)(uint64, error){
 		return 0, err
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {    
-
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {     
 		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f",claims["user_id"]), 10, 64)
 
 		if err != nil {
 			return 0, nil
-		} 
-
+		}  
 		return uid, nil
-	}
-
+	} 
 	return 0, nil
 }

@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/vonmutinda/crafted/api/auto" 
+	// "github.com/vonmutinda/crafted/api/auto"
 	"github.com/vonmutinda/crafted/api/router"
 	"github.com/vonmutinda/crafted/config"
 )
@@ -31,7 +31,7 @@ func init(){
 
 
 func run(){ 
-	auto.Load() 
+	// auto.Load() 
 
 	// set routes 
 	r := router.LoadCORS(router.New())

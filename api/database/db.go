@@ -4,7 +4,8 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/vonmutinda/crafted/config"
 	"github.com/vonmutinda/crafted/api/log"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	// _ "github.com/go-sql-driver/mysql"
 )
 
 var (

@@ -8,7 +8,7 @@ import (
 )
 
 // Load and Auto-migrate models
-func Load(){  
+func init(){  
  
 	if err := database.GetDB().DropTableIfExists(&models.Article{}, &models.User{}).Error; err != nil{
 		log.Println(err)

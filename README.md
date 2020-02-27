@@ -26,6 +26,7 @@ Inspired By [`Washington Redskins`](https://en.wikipedia.org/wiki/Go_Fund_Yourse
 - [x] Queues and Messaging with `RabbitMQ` (unneccessary though)
 - [x] Logging Errors
 - [x] Authentication and Authorization Middlewares
+- [x] CORS with Gorilla Handlers
 
 ## #TODOs
 - [ ] Unit Testing

@@ -19,7 +19,7 @@ func SetUpLoggerMiddleware(next http.HandlerFunc) http.HandlerFunc{
 		entry := fmt.Sprintf("%s %s%s %s", r.Method, r.Host, r.RequestURI, r.Proto)
 		
 		log.Println(entry)
-		logger.GetLogger().Info(fmt.Sprintf("%s %s%s %s", r.Method, r.Host, r.RequestURI, r.Proto))
+		logger.GetLogger().Info(entry)
 
 		next(w,r)
 	}
