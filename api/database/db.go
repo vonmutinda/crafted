@@ -2,30 +2,33 @@ package database
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/vonmutinda/crafted/config"
+	_ "github.com/jinzhu/gorm/dialects/mssql"    //mssql dialect
+	_ "github.com/jinzhu/gorm/dialects/mysql"    //mysql dialect
+	_ "github.com/jinzhu/gorm/dialects/postgres" //psql dialect
+	_ "github.com/jinzhu/gorm/dialects/sqlite"   //sqlite dialect
+
 	"github.com/vonmutinda/crafted/api/log"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
-	// _ "github.com/go-sql-driver/mysql"
+	"github.com/vonmutinda/crafted/config"
 )
 
 var (
 	err error
-	
+
 	db *gorm.DB
 )
 
 // Connect to db
-func init()  {
-
+func init() {
 	db, err = gorm.Open(config.DB_DRIVER, config.DB_URL)
+	if err != nil {
+		log.GetLogger().Errorf("cannot connect to db :%v", err)
+	} else {
 
-	if err != nil { 
-		 log.GetLogger().Errorf("cannot connect to db :%v",err)
 	}
- 
+
 }
 
 // GetDB returns db conn
-func GetDB() *gorm.DB{ 
+func GetDB() *gorm.DB {
 	return db
 }

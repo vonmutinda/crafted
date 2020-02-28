@@ -45,6 +45,8 @@ For set up on your machine .
 ### .env file
 
 ```go
+    ENV="local"
+
     PORT=":9000"
 
     DB_DRIVER="postgres" # <-provide your own-->
