@@ -1,12 +1,5 @@
 ## Crafted - All about Golang & Microservices
-Let's built a microservice as ROBUST as possible. Bringing on-board all
-possible awesome technologies.
-
-I like simple and that's exactly how we'll do this. ```#LetThereBeEXCELLENCE```. 
-Collaboration is totally welcome. It's a great way of learning new stuff along the way.
-```go
-simple is better than comlex - always
-```
+Let's built a ROBUST microservice. 
 
 ## Description
 Just for func
@@ -14,16 +7,14 @@ Just for func
 ```go
     go func(){
 
-    }(yourself)
+    }()
 ```
-
-Inspired By [`Washington Redskins`](https://en.wikipedia.org/wiki/Go_Fund_Yourself)
 
 ## Features
 - [x] RESTful operations
 - [x] DB connection with ```gorm``` and RAW SQL usage alongside [GORM](https://gorm.io)
 - [x] CLI tooling with Cobra 
-- [x] Queues and Messaging with `RabbitMQ` (unneccessary though)
+- [x] Queues and Messaging with `RabbitMQ` or `Redis`.
 - [x] Logging Errors
 - [x] Authentication and Authorization Middlewares
 - [x] CORS with Gorilla Handlers
@@ -33,7 +24,7 @@ Inspired By [`Washington Redskins`](https://en.wikipedia.org/wiki/Go_Fund_Yourse
 - [ ] GraphQL APIs 
 - [ ] gRPC  
 - [ ] Docker (containerization) 
-- [ ] Service Deployment
+- [ ] CI/CD
 - [ ] Grafana and Prometheus Integrations (Later on)
 
 ## Setup Local
@@ -96,8 +87,7 @@ go run main.go consume
 You realise this application is growing too big and once users begin interacting with it in production,
 We'll need a way to know where it fails. 
 
-Later on we'll configure our logger and other parts of our app with [`Prometheus`](https://prometheus.io/) are [Grafana](https://grafana.com/) which are more like [Sentry](https://sentry.io/welcome/) and [Google Analytics](https://analytics.google.com/analytics/web/)
-
+Later on we'll configure our logger and other parts of our app with [`Prometheus`](https://prometheus.io/) are [Grafana](https://grafana.com/).
 
 ## Technologies Used 
 Here's a list of technologies used in this project
